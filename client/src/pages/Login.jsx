@@ -61,7 +61,7 @@ export default function Login({ onLogin }) {
           <span className="sap-shell-title">{t('appName')}</span>
         </div>
         <div className="sap-shell-right">
-          <div className="lang-switcher" style={{ marginRight: '1rem' }}>
+          <div className="lang-switcher" style={{ marginInlineEnd: '1rem' }}>
             <button 
               className={`lang-btn ${lang === 'en' ? 'active' : ''}`}
               onClick={() => setLang('en')}

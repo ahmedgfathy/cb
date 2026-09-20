@@ -46,32 +46,23 @@ body {
   src: url('/fonts/Cairo-Variable.ttf') format('truetype');
 }
 
-/* Arabic RTL mode */
-body.rtl,
-body.rtl * {
-  direction: rtl;
-  text-align: right;
-}
-
+/* ═══════════════════════════════════════════════════
+   Arabic RTL Mode
+   ═══════════════════════════════════════════════════ */
 body.rtl {
   font-family: 'Cairo', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-body.rtl .material-icons {
-  direction: ltr;
-}
-
-body.rtl .pagination-buttons {
-  direction: ltr;
-}
-
+/* Layout flip */
 body.rtl .app-layout {
   direction: rtl;
 }
 
-body.rtl .sidebar {
+body.rtl .sap-sidebar {
+  left: auto;
+  right: 0;
   border-right: none;
-  border-left: 1px solid rgba(255,255,255,0.08);
+  border-left: 1px solid #e5e5e5;
 }
 
 body.rtl .main-content {
@@ -79,27 +70,26 @@ body.rtl .main-content {
   margin-right: 15rem;
 }
 
-body.rtl .nav-item {
+/* Nav active indicator: left border → right border */
+body.rtl .sap-nav-item {
+  text-align: right;
+  border-left: none;
+  border-right: 3px solid transparent;
+}
+
+body.rtl .sap-nav-item.active {
+  border-right-color: #0a6ed1;
+  border-left-color: transparent;
+}
+
+/* Tables: text right, actions left */
+body.rtl .data-table th,
+body.rtl .data-table td {
   text-align: right;
 }
 
-body.rtl .form-row {
-  direction: rtl;
-}
-
-body.rtl table {
-  direction: rtl;
-}
-
-body.rtl th, body.rtl td {
-  text-align: right;
-}
-
-body.rtl th:first-child, body.rtl td:first-child {
-  text-align: right;
-}
-
-body.rtl th:last-child, body.rtl td:last-child {
+body.rtl .data-table th:last-child,
+body.rtl .data-table td:last-child {
   text-align: left;
 }
 
@@ -107,6 +97,17 @@ body.rtl .actions {
   justify-content: flex-start;
 }
 
+/* Page header buttons: RTL order */
+body.rtl .page-header {
+  flex-direction: row-reverse;
+}
+
+/* Modal: keep close button on correct side */
+body.rtl .modal-header {
+  flex-direction: row-reverse;
+}
+
+/* Badges & numbers stay LTR */
 body.rtl .badge {
   direction: ltr;
   display: inline-flex;
@@ -114,6 +115,24 @@ body.rtl .badge {
 
 body.rtl .pagination-info {
   direction: ltr;
+}
+
+body.rtl .pagination-buttons {
+  direction: ltr;
+}
+
+body.rtl .sap-shell-bar {
+  flex-direction: row-reverse;
+}
+
+/* Form labels text-align */
+body.rtl label {
+  text-align: right;
+}
+
+/* Inline edit buttons RTL */
+body.rtl .inline-edit {
+  flex-direction: row-reverse;
 }
 
 /* Material Icons alignment */

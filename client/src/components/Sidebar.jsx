@@ -82,35 +82,38 @@ export default function Sidebar({ page, setPage, user, onLogout }) {
       </nav>
 
       <div className="sap-nav-footer">
-        {/* Language Switcher */}
-        <div className="lang-switcher">
-          <button 
-            className={`lang-btn ${lang === 'en' ? 'active' : ''}`}
-            onClick={() => setLang('en')}
-            title="English"
-          >EN</button>
-          <button 
-            className={`lang-btn ${lang === 'ar' ? 'active' : ''}`}
-            onClick={() => setLang('ar')}
-            title="العربية"
-          >AR</button>
-        </div>
-
-        <div className="sap-user">
-          <div className="sap-user-avatar">
-            {user?.name?.[0]?.toUpperCase() || 'U'}
-          </div>
-          <div className="sap-user-info">
-            <span className="sap-user-name">{user?.name || 'User'}</span>
-            <span className="sap-user-role">
-              {isSuperAdmin ? t('companyAdmin') : isCompanyAdmin ? t('companyAdmin') : t('employee')}
-              {user?.companyName ? ` · ${user.companyName}` : ''}
-            </span>
+        <div className="sap-nav-footer-top">
+          {/* Language Switcher */}
+          <div className="lang-switcher">
+            <button 
+              className={`lang-btn ${lang === 'en' ? 'active' : ''}`}
+              onClick={() => setLang('en')}
+              title="English"
+            >EN</button>
+            <button 
+              className={`lang-btn ${lang === 'ar' ? 'active' : ''}`}
+              onClick={() => setLang('ar')}
+              title="العربية"
+            >AR</button>
           </div>
         </div>
-        <button className="sap-logout" onClick={onLogout} title={t('logout')}>
-          <span className="material-icons" style={{ fontSize: '20px' }}>logout</span>
-        </button>
+        <div className="sap-nav-footer-bottom">
+          <div className="sap-user">
+            <div className="sap-user-avatar">
+              {user?.name?.[0]?.toUpperCase() || 'U'}
+            </div>
+            <div className="sap-user-info">
+              <span className="sap-user-name">{user?.name || 'User'}</span>
+              <span className="sap-user-role">
+                {isSuperAdmin ? t('companyAdmin') : isCompanyAdmin ? t('companyAdmin') : t('employee')}
+                {user?.companyName ? ` · ${user.companyName}` : ''}
+              </span>
+            </div>
+          </div>
+          <button className="sap-logout" onClick={onLogout} title={t('logout')}>
+            <span className="material-icons" style={{ fontSize: '20px' }}>logout</span>
+          </button>
+        </div>
       </div>
     </aside>
   )
