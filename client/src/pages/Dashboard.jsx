@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import { useI18n } from '../i18n'
 
 export default function Dashboard({ user }) {
   const [data, setData] = useState(null)

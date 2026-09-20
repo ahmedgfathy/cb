@@ -1,6 +1,8 @@
+import { useI18n } from '../i18n'
 import './Sidebar.css'
 
 export default function Sidebar({ page, setPage, user, onLogout }) {
+  const { lang, setLang, t } = useI18n()
   const isSuperAdmin = user?.role === 'super_admin'
   const isCompanyAdmin = user?.role === 'company_admin'
 
@@ -8,44 +10,44 @@ export default function Sidebar({ page, setPage, user, onLogout }) {
 
   if (isSuperAdmin) {
     navSections.push(
-      { label: 'ADMINISTRATION', items: [
-        { id: 'dashboard', icon: 'dashboard', label: 'Overview' },
-        { id: 'pending', icon: 'pending_actions', label: 'Pending Approvals' },
-        { id: 'companies', icon: 'apartment', label: 'Companies' },
-        { id: 'all-users', icon: 'people', label: 'All Users' },
+      { label: t('dashboard').toUpperCase(), items: [
+        { id: 'dashboard', icon: 'dashboard', label: t('dashboard') },
+        { id: 'pending', icon: 'pending_actions', label: t('pendingApprovals') },
+        { id: 'companies', icon: 'apartment', label: t('companies') },
+        { id: 'all-users', icon: 'people', label: t('allUsers') },
       ]},
-      { label: 'CRM DATA', items: [
-        { id: 'properties', icon: 'home', label: 'Properties' },
-        { id: 'contacts', icon: 'contacts', label: 'Contacts' },
-        { id: 'leads', icon: 'description', label: 'Leads' },
-        { id: 'opportunities', icon: 'work', label: 'Opportunities' },
+      { label: 'CRM', items: [
+        { id: 'properties', icon: 'home', label: t('properties') },
+        { id: 'contacts', icon: 'contacts', label: t('contacts') },
+        { id: 'leads', icon: 'description', label: t('leads') },
+        { id: 'opportunities', icon: 'work', label: t('opportunities') },
       ]},
     )
   } else if (isCompanyAdmin) {
     navSections.push(
-      { label: 'COMPANY', items: [
-        { id: 'dashboard', icon: 'dashboard', label: 'Overview' },
-        { id: 'employees', icon: 'people', label: 'Employees' },
-        { id: 'dropdown-values', icon: 'list', label: 'Dropdown Values' },
+      { label: t('companies').toUpperCase(), items: [
+        { id: 'dashboard', icon: 'dashboard', label: t('dashboard') },
+        { id: 'employees', icon: 'people', label: t('employees') },
+        { id: 'dropdown-values', icon: 'list', label: t('lookupValues') },
       ]},
-      { label: 'SALES', items: [
-        { id: 'leads', icon: 'description', label: 'Leads' },
-        { id: 'opportunities', icon: 'work', label: 'Opportunities' },
-        { id: 'contacts', icon: 'contacts', label: 'Contacts' },
+      { label: 'CRM', items: [
+        { id: 'leads', icon: 'description', label: t('leads') },
+        { id: 'opportunities', icon: 'work', label: t('opportunities') },
+        { id: 'contacts', icon: 'contacts', label: t('contacts') },
       ]},
-      { label: 'REAL ESTATE', items: [
-        { id: 'properties', icon: 'home', label: 'Properties' },
-        { id: 'documents', icon: 'folder_open', label: 'Documents' },
+      { label: t('properties').toUpperCase(), items: [
+        { id: 'properties', icon: 'home', label: t('properties') },
+        { id: 'documents', icon: 'folder_open', label: t('documents') },
       ]},
     )
   } else {
     navSections.push(
-      { label: 'SALES', items: [
-        { id: 'leads', icon: 'description', label: 'Leads' },
-        { id: 'contacts', icon: 'contacts', label: 'Contacts' },
+      { label: 'CRM', items: [
+        { id: 'leads', icon: 'description', label: t('leads') },
+        { id: 'contacts', icon: 'contacts', label: t('contacts') },
       ]},
-      { label: 'REAL ESTATE', items: [
-        { id: 'properties', icon: 'home', label: 'Properties' },
+      { label: t('properties').toUpperCase(), items: [
+        { id: 'properties', icon: 'home', label: t('properties') },
       ]},
     )
   }
@@ -55,7 +57,7 @@ export default function Sidebar({ page, setPage, user, onLogout }) {
       <div className="sap-shell-bar">
         <div className="sap-shell-left">
           <span className="material-icons" style={{ fontSize: '22px' }}>business</span>
-          <span className="sap-shell-text">CB Real Estate</span>
+          <span className="sap-shell-text">{t('appName')}</span>
         </div>
       </div>
 
@@ -80,6 +82,20 @@ export default function Sidebar({ page, setPage, user, onLogout }) {
       </nav>
 
       <div className="sap-nav-footer">
+        {/* Language Switcher */}
+        <div className="lang-switcher">
+          <button 
+            className={`lang-btn ${lang === 'en' ? 'active' : ''}`}
+            onClick={() => setLang('en')}
+            title="English"
+          >EN</button>
+          <button 
+            className={`lang-btn ${lang === 'ar' ? 'active' : ''}`}
+            onClick={() => setLang('ar')}
+            title="العربية"
+          >AR</button>
+        </div>
+
         <div className="sap-user">
           <div className="sap-user-avatar">
             {user?.name?.[0]?.toUpperCase() || 'U'}
@@ -87,12 +103,12 @@ export default function Sidebar({ page, setPage, user, onLogout }) {
           <div className="sap-user-info">
             <span className="sap-user-name">{user?.name || 'User'}</span>
             <span className="sap-user-role">
-              {isSuperAdmin ? 'Super Admin' : isCompanyAdmin ? 'Company Admin' : 'Employee'}
+              {isSuperAdmin ? t('companyAdmin') : isCompanyAdmin ? t('companyAdmin') : t('employee')}
               {user?.companyName ? ` · ${user.companyName}` : ''}
             </span>
           </div>
         </div>
-        <button className="sap-logout" onClick={onLogout} title="Sign Out">
+        <button className="sap-logout" onClick={onLogout} title={t('logout')}>
           <span className="material-icons" style={{ fontSize: '20px' }}>logout</span>
         </button>
       </div>

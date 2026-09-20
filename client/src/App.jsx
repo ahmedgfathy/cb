@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api, getToken } from './api'
+import { I18nProvider } from './i18n'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import PendingApprovals from './pages/PendingApprovals'
@@ -49,7 +50,11 @@ function App() {
   }
 
   if (!loggedIn) {
-    return <Login onLogin={handleLogin} />
+    return (
+      <I18nProvider>
+        <Login onLogin={handleLogin} />
+      </I18nProvider>
+    )
   }
 
   const isSuperAdmin = user?.role === 'super_admin'
@@ -76,12 +81,14 @@ function App() {
   pages.documents = <Documents />
 
   return (
-    <div className="app-layout">
-      <Sidebar page={page} setPage={handlePageChange} user={user} onLogout={handleLogout} />
-      <main className="main-content">
-        {pages[page] || <Dashboard />}
-      </main>
-    </div>
+    <I18nProvider>
+      <div className="app-layout">
+        <Sidebar page={page} setPage={handlePageChange} user={user} onLogout={handleLogout} />
+        <main className="main-content">
+          {pages[page] || <Dashboard />}
+        </main>
+      </div>
+    </I18nProvider>
   )
 }
 

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
 import Pagination from '../components/Pagination'
+import { useI18n } from '../i18n'
 
 const emptyContact = { name: '', email: '', phone: '', type: 'buyer', notes: '' }
 
 export default function Contacts() {
+  const { t } = useI18n()
   const [contacts, setContacts] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -47,7 +49,7 @@ export default function Contacts() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Delete this contact?')) return
+    if (!confirm(t('deleteContact'))) return
     try { await api.deleteContact(id); load() }
     catch (err) { alert(err.message) }
   }
@@ -55,7 +57,7 @@ export default function Contacts() {
   return (
     <div>
       <div className="page-header">
-        <h1>👥 Contacts</h1>
+        <h1><span className="material-icons">contacts</span> {t('contactsTitle')}</h1>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
             value={filter}
@@ -65,23 +67,28 @@ export default function Contacts() {
               fontSize: '0.8125rem', color: '#32363a', background: '#fff'
             }}
           >
-            <option value="all">All Types</option>
-            <option value="buyer">Buyers</option>
-            <option value="seller">Sellers</option>
-            <option value="tenant">Tenants</option>
-            <option value="owner">Owners</option>
+            <option value="all">{t('allTypes')}</option>
+            <option value="buyer">{t('buyer')}</option>
+            <option value="seller">{t('seller')}</option>
+            <option value="tenant">{t('tenant')}</option>
+            <option value="owner">{t('owner')}</option>
           </select>
-          <button className="btn-primary" onClick={openNew}>+ Add Contact</button>
+          <button className="btn-primary" onClick={openNew}>
+            <span className="material-icons" style={{ fontSize: '18px' }}>add</span>
+            {t('addContact')}
+          </button>
         </div>
       </div>
 
       <div className="page-body">
-        {loading ? <div className="loading-spinner">Loading...</div>
+        {loading ? <div className="loading-spinner">{t('loading')}</div>
          : filtered.length === 0 ? (
           <div className="sap-tile">
             <div className="empty-state">
-              <div className="empty-icon">👥</div>
-              <p>No contacts found</p>
+              <div className="empty-icon">
+                <span className="material-icons" style={{ fontSize: '48px', color: '#d9d9d9' }}>contacts</span>
+              </div>
+              <p>{t('noContacts')}</p>
             </div>
           </div>
         ) : (
@@ -89,12 +96,12 @@ export default function Contacts() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Type</th>
-                  <th>Notes</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th>{t('name')}</th>
+                  <th>{t('email')}</th>
+                  <th>{t('phone')}</th>
+                  <th>{t('type')}</th>
+                  <th>{t('notes')}</th>
+                  <th style={{ textAlign: 'right' }}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -108,8 +115,12 @@ export default function Contacts() {
                       {c.notes || '—'}
                     </td>
                     <td className="actions">
-                      <button className="btn-edit" onClick={() => openEdit(c)} title="Edit">✏️</button>
-                      <button className="btn-delete" onClick={() => handleDelete(c.id)} title="Delete">🗑️</button>
+                      <button className="btn-icon btn-icon-primary" onClick={() => openEdit(c)} title={t('edit')}>
+                        <span className="material-icons">edit</span>
+                      </button>
+                      <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(c.id)} title={t('delete')}>
+                        <span className="material-icons">delete</span>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -130,42 +141,44 @@ export default function Contacts() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editing ? 'Edit Contact' : 'New Contact'}</h2>
-              <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+              <h2>{editing ? t('editContact') : t('newContact')}</h2>
+              <button className="modal-close" onClick={() => setShowModal(false)}>
+                <span className="material-icons" style={{ fontSize: '20px' }}>close</span>
+              </button>
             </div>
             <form onSubmit={handleSave}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label>Name <span className="required">*</span></label>
-                  <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder="Full name" required />
+                  <label>{t('name')} <span className="required">*</span></label>
+                  <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder={t('fullName')} required />
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Email</label>
+                    <label>{t('email')}</label>
                     <input type="email" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} placeholder="email@example.com" />
                   </div>
                   <div className="form-group">
-                    <label>Phone</label>
+                    <label>{t('phone')}</label>
                     <input value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})} placeholder="+1 234 567 890" />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Type</label>
+                  <label>{t('type')}</label>
                   <select value={form.type} onChange={(e) => setForm({...form, type: e.target.value})}>
-                    <option value="buyer">Buyer</option>
-                    <option value="seller">Seller</option>
-                    <option value="tenant">Tenant</option>
-                    <option value="owner">Owner</option>
+                    <option value="buyer">{t('buyer')}</option>
+                    <option value="seller">{t('seller')}</option>
+                    <option value="tenant">{t('tenant')}</option>
+                    <option value="owner">{t('owner')}</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Notes</label>
-                  <textarea value={form.notes} onChange={(e) => setForm({...form, notes: e.target.value})} rows={3} placeholder="Additional notes..." />
+                  <label>{t('notes')}</label>
+                  <textarea value={form.notes} onChange={(e) => setForm({...form, notes: e.target.value})} rows={3} placeholder={t('additionalNotes')} />
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">{editing ? 'Update' : 'Create'}</button>
+                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>{t('cancel')}</button>
+                <button type="submit" className="btn-primary">{editing ? t('update') : t('create')}</button>
               </div>
             </form>
           </div>

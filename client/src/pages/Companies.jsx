@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
 import Pagination from '../components/Pagination'
+import { useI18n } from '../i18n'
 
 export default function Companies() {
+  const { t } = useI18n()
   const [companies, setCompanies] = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(null)
@@ -31,9 +33,9 @@ export default function Companies() {
   }
 
   const statusConfig = {
-    active: { label: 'Active', className: 'badge badge-available', icon: 'check_circle' },
-    pending: { label: 'Pending', className: 'badge badge-pending', icon: 'schedule' },
-    rejected: { label: 'Rejected', className: 'badge badge-lost', icon: 'cancel' },
+    active: { label: t('active'), className: 'badge badge-available', icon: 'check_circle' },
+    pending: { label: t('pending'), className: 'badge badge-pending', icon: 'schedule' },
+    rejected: { label: t('rejected'), className: 'badge badge-lost', icon: 'cancel' },
   }
 
   const totalPages = Math.max(1, Math.ceil(companies.length / perPage))
@@ -43,18 +45,18 @@ export default function Companies() {
   return (
     <div>
       <div className="page-header">
-        <h1><span className="material-icons">apartment</span> Companies</h1>
+        <h1><span className="material-icons">apartment</span> {t('companiesTitle')}</h1>
         <div className="toolbar">
           <select value={filter} onChange={(e) => { setFilter(e.target.value); resetPage(); }}>
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
+            <option value="all">{t('allStatus')}</option>
+            <option value="active">{t('active')}</option>
+            <option value="pending">{t('pending')}</option>
+            <option value="rejected">{t('rejected')}</option>
           </select>
         </div>
       </div>
       <div className="page-body">
-        {loading ? <div className="loading-spinner">Loading...</div>
+        {loading ? <div className="loading-spinner">{t('loading')}</div>
          : companies.length === 0 ? (
           <div className="sap-tile">
             <div className="empty-state">
@@ -68,13 +70,13 @@ export default function Companies() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Company</th>
-                  <th>Mobile</th>
-                  <th>Status</th>
-                  <th>Users</th>
-                  <th>Max Users</th>
-                  <th>Registered</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th>{t('company')}</th>
+                  <th>{t('mobile')}</th>
+                  <th>{t('status')}</th>
+                  <th>{t('users')}</th>
+                  <th>{t('maxUsers')}</th>
+                  <th>{t('registered')}</th>
+                  <th style={{ textAlign: 'right' }}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -123,8 +125,8 @@ export default function Companies() {
                               onChange={(e) => setMaxUsers(parseInt(e.target.value) || 1)}
                               min="1"
                             />
-                            <button className="btn-primary btn-sm" onClick={() => updateLimit(c.id)}>Save</button>
-                            <button className="btn-default btn-sm" onClick={() => setEditing(null)}>Cancel</button>
+                            <button className="btn-primary btn-sm" onClick={() => updateLimit(c.id)}>{t('save')}</button>
+                            <button className="btn-default btn-sm" onClick={() => setEditing(null)}>{t('cancel')}</button>
                           </div>
                         ) : (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -132,7 +134,7 @@ export default function Companies() {
                             <button
                               className="btn-icon btn-icon-primary"
                               onClick={() => { setEditing(c.id); setMaxUsers(c.max_users) }}
-                              title="Edit limit"
+                              title={t('editLimit')}
                             >
                               <span className="material-icons">edit</span>
                             </button>
@@ -142,7 +144,7 @@ export default function Companies() {
                       <td className="cell-muted">{new Date(c.created_at).toLocaleDateString()}</td>
                       <td style={{ textAlign: 'right' }}>
                         {c.status === 'pending' && (
-                          <span className="cell-muted" style={{ fontSize: '0.8125rem' }}>See Pending Approvals</span>
+                          <span className="cell-muted" style={{ fontSize: '0.8125rem' }}>{t('pendingApproval')}</span>
                         )}
                       </td>
                     </tr>

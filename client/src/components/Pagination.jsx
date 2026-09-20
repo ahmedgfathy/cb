@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useI18n } from '../i18n'
 
 export default function Pagination({ 
   total, 
@@ -8,6 +9,7 @@ export default function Pagination({
   onPerPageChange,
   perPageOptions = [10, 25, 50, 100]
 }) {
+  const { t } = useI18n()
   const [jumpTo, setJumpTo] = useState('')
   const totalPages = Math.max(1, Math.ceil(total / perPage))
   const safePage = Math.min(Math.max(1, page), totalPages)
@@ -63,13 +65,13 @@ export default function Pagination({
   return (
     <div className="pagination-wrap">
       <div className="pagination-info">
-        <span>Showing <strong>{start}</strong> to <strong>{end}</strong> of <strong>{total}</strong> entries</span>
+        <span>{t('showingXtoYofZ', { start, end, total })}</span>
       </div>
       
       <div className="pagination-controls">
         {/* Per page selector */}
         <div className="pagination-perpage">
-          <label>Show</label>
+          <label>{t('showing')}</label>
           <select 
             value={perPage} 
             onChange={(e) => onPerPageChange(parseInt(e.target.value, 10))}
@@ -79,7 +81,7 @@ export default function Pagination({
               <option key={n} value={n}>{n}</option>
             ))}
           </select>
-          <label>per page</label>
+          <label>{t('perPage')}</label>
         </div>
 
         {/* Page buttons */}
@@ -135,7 +137,7 @@ export default function Pagination({
 
         {/* Jump to page */}
         <div className="pagination-jump">
-          <label>Go to</label>
+          <label>{t('goTo')}</label>
           <input
             type="number"
             min={1}

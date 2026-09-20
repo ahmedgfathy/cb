@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import { useI18n } from '../i18n'
 import Pagination from '../components/Pagination'
 
 const emptyLead = {
@@ -10,6 +11,7 @@ const emptyLead = {
 }
 
 export default function Leads() {
+  const { t } = useI18n()
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
@@ -131,7 +133,7 @@ export default function Leads() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Delete this lead?')) return
+    if (!confirm(t('deleteLead'))) return
     try {
       await api.deleteLead(id)
       setSelected(null)
@@ -148,17 +150,17 @@ export default function Leads() {
     return (
       <div>
         <div className="page-header">
-          <h1><span className="material-icons">description</span> Lead {selected.lead_number}</h1>
+          <h1><span className="material-icons">description</span> {t('leadNumber')} {selected.lead_number}</h1>
           <div style={{ display: 'flex', gap: '0.4rem' }}>
             <button className="btn-default" onClick={() => setSelected(null)}
               style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}>
-              <span className="material-icons" style={{ fontSize: '18px' }}>arrow_back</span> Back
+              <span className="material-icons" style={{ fontSize: '18px' }}>arrow_back</span> {t('back')}
             </button>
             <button className="btn-primary" onClick={() => openEdit(selected)}>
-              <span className="material-icons" style={{ fontSize: '18px' }}>edit</span> Edit
+              <span className="material-icons" style={{ fontSize: '18px' }}>edit</span> {t('edit')}
             </button>
             <button className="btn-primary btn-danger" onClick={() => handleDelete(selected.id)}>
-              <span className="material-icons" style={{ fontSize: '18px' }}>delete</span> Delete
+              <span className="material-icons" style={{ fontSize: '18px' }}>delete</span> {t('delete')}
             </button>
           </div>
         </div>
@@ -167,34 +169,34 @@ export default function Leads() {
             <div className="sap-tile">
               <div className="section-title">
                 <span className="material-icons" style={{ fontSize: '18px', color: '#0a6ed1' }}>person</span>
-                Client Information
+                {t('clientInformation')}
               </div>
               <table style={{ width: '100%', fontSize: '0.875rem' }}>
                 <tbody>
-                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70', width: '40%' }}>Lead Number</td><td style={{ padding: '0.35rem 0', fontWeight: 600, color: '#0a6ed1' }}>{selected.lead_number}</td></tr>
-                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Salutation</td><td style={{ padding: '0.35rem 0' }}>{selected.salutation || '—'}</td></tr>
-                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Last Name</td><td style={{ padding: '0.35rem 0', fontWeight: 600 }}>{selected.last_name}</td></tr>
-                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Mobile</td><td style={{ padding: '0.35rem 0' }}>{selected.mobile || '—'}</td></tr>
+                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70', width: '40%' }}>{t('leadNumber')}</td><td style={{ padding: '0.35rem 0', fontWeight: 600, color: '#0a6ed1' }}>{selected.lead_number}</td></tr>
+                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>{t('salutation')}</td><td style={{ padding: '0.35rem 0' }}>{selected.salutation || '—'}</td></tr>
+                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>{t('lastName')}</td><td style={{ padding: '0.35rem 0', fontWeight: 600 }}>{selected.last_name}</td></tr>
+                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>{t('mobile')}</td><td style={{ padding: '0.35rem 0' }}>{selected.mobile || '—'}</td></tr>
                 </tbody>
               </table>
             </div>
             <div className="sap-tile">
               <div className="section-title">
                 <span className="material-icons" style={{ fontSize: '18px', color: '#e9730c' }}>info</span>
-                Status & Classification
+                {t('statusClassification')}
               </div>
               <table style={{ width: '100%', fontSize: '0.875rem' }}>
                 <tbody>
                   <tr>
-                    <td style={{ padding: '0.35rem 0', color: '#6a6d70', width: '40%' }}>Call Status</td>
+                    <td style={{ padding: '0.35rem 0', color: '#6a6d70', width: '40%' }}>{t('callStatus')}</td>
                     <td style={{ padding: '0.35rem 0' }}><span className="badge" style={{ background: sc.bg, color: sc.fg }}>{selected.call_status || '—'}</span></td>
                   </tr>
                   <tr>
-                    <td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Client Status</td>
+                    <td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>{t('clientStatus')}</td>
                     <td style={{ padding: '0.35rem 0' }}><span className="badge" style={{ background: csc.bg, color: csc.fg }}>{selected.client_status || '—'}</span></td>
                   </tr>
-                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Unit Type</td><td style={{ padding: '0.35rem 0' }}><span className="badge badge-rented">{selected.unit_type || '—'}</span></td></tr>
-                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Activity Type</td><td style={{ padding: '0.35rem 0' }}><span className="badge badge-owner">{selected.activity_type || '—'}</span></td></tr>
+                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>{t('unitTypeInterest')}</td><td style={{ padding: '0.35rem 0' }}><span className="badge badge-rented">{selected.unit_type || '—'}</span></td></tr>
+                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>{t('activityType')}</td><td style={{ padding: '0.35rem 0' }}><span className="badge badge-owner">{selected.activity_type || '—'}</span></td></tr>
                 </tbody>
               </table>
             </div>
@@ -204,11 +206,11 @@ export default function Leads() {
             <div className="sap-tile">
               <div className="section-title">
                 <span className="material-icons" style={{ fontSize: '18px', color: '#8a4cca' }}>group</span>
-                Assignment & Follow-up
+                {t('assignmentFollowup')}
               </div>
               <table style={{ width: '100%', fontSize: '0.875rem' }}>
                 <tbody>
-                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70', width: '40%' }}>Assigned To</td><td style={{ padding: '0.35rem 0', fontWeight: 600 }}>{selected.assigned_to_name || '—'}</td></tr>
+                  <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70', width: '40%' }}>{t('assignedTo')}</td><td style={{ padding: '0.35rem 0', fontWeight: 600 }}>{selected.assigned_to_name || '—'}</td></tr>
                   <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Last Follow-up</td><td style={{ padding: '0.35rem 0' }}>{formatDate(selected.last_followup)}</td></tr>
                   <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Created At</td><td style={{ padding: '0.35rem 0' }}>{formatDate(selected.created_at)}</td></tr>
                   <tr><td style={{ padding: '0.35rem 0', color: '#6a6d70' }}>Last Modified By</td><td style={{ padding: '0.35rem 0' }}>{selected.last_modified_by || '—'}</td></tr>
@@ -219,16 +221,16 @@ export default function Leads() {
             <div className="sap-tile">
               <div className="section-title">
                 <span className="material-icons" style={{ fontSize: '18px', color: '#36b37e' }}>notes</span>
-                Notes & Feedback
+                {t('notesFeedback')}
               </div>
               <div style={{ marginBottom: '0.75rem' }}>
-                <div style={{ fontSize: '0.8125rem', color: '#6a6d70', marginBottom: '0.2rem', fontWeight: 600 }}>Feedback</div>
+                <div style={{ fontSize: '0.8125rem', color: '#6a6d70', marginBottom: '0.2rem', fontWeight: 600 }}>{t('feedback')}</div>
                 <div style={{ fontSize: '0.875rem', padding: '0.5rem', background: '#f7f7f7', borderRadius: '0.375rem', minHeight: '2.5rem', whiteSpace: 'pre-wrap' }}>
                   {selected.feedback || '—'}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: '0.8125rem', color: '#6a6d70', marginBottom: '0.2rem', fontWeight: 600 }}>Description</div>
+                <div style={{ fontSize: '0.8125rem', color: '#6a6d70', marginBottom: '0.2rem', fontWeight: 600 }}>{t('description')}</div>
                 <div style={{ fontSize: '0.875rem', padding: '0.5rem', background: '#f7f7f7', borderRadius: '0.375rem', minHeight: '4rem', whiteSpace: 'pre-wrap' }}>
                   {selected.description || '—'}
                 </div>
@@ -244,14 +246,14 @@ export default function Leads() {
   return (
     <div>
       <div className="page-header">
-        <h1><span className="material-icons">description</span> Leads</h1>
+        <h1><span className="material-icons">description</span> {t('leadsTitle')}</h1>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <input type="text" placeholder="Search name, mobile, lead#..." value={search}
+          <input type="text" placeholder={t('searchLeads')} value={search}
             onChange={(e) => { setSearch(e.target.value); resetPage(); }}
             style={{ height: '2rem', padding: '0 0.75rem', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '0.375rem', fontSize: '0.875rem', color: '#fff', background: 'rgba(255,255,255,0.12)', width: '13rem', outline: 'none' }} />
           <button className="btn-primary" onClick={openNew}>
             <span className="material-icons" style={{ fontSize: '18px' }}>add</span>
-            Add Lead
+            {t('addLead')}
           </button>
         </div>
       </div>
@@ -264,7 +266,7 @@ export default function Leads() {
             </div>
             <div className="stat-info">
               <div className="stat-value" style={{ fontSize: '1.375rem' }}>{leads.length}</div>
-              <div className="stat-label">Total</div>
+              <div className="stat-label">{t('leads')}</div>
             </div>
           </div>
           <div className="stat-card" style={{ padding: '0.75rem 1rem' }}>
@@ -273,7 +275,7 @@ export default function Leads() {
             </div>
             <div className="stat-info">
               <div className="stat-value" style={{ fontSize: '1.375rem' }}>{leads.filter(l => l.call_status === 'تم الرد').length}</div>
-              <div className="stat-label">Answered</div>
+              <div className="stat-label">{t('answered')}</div>
             </div>
           </div>
           <div className="stat-card" style={{ padding: '0.75rem 1rem' }}>
@@ -282,7 +284,7 @@ export default function Leads() {
             </div>
             <div className="stat-info">
               <div className="stat-value" style={{ fontSize: '1.375rem' }}>{leads.filter(l => l.call_status === 'لا يرد').length}</div>
-              <div className="stat-label">No Answer</div>
+              <div className="stat-label">{t('noAnswer')}</div>
             </div>
           </div>
           <div className="stat-card" style={{ padding: '0.75rem 1rem' }}>
@@ -291,17 +293,17 @@ export default function Leads() {
             </div>
             <div className="stat-info">
               <div className="stat-value" style={{ fontSize: '1.375rem' }}>{leads.filter(l => l.client_status === 'مهتم بالايجار').length}</div>
-              <div className="stat-label">Interested</div>
+              <div className="stat-label">{t('interestedInRent')}</div>
             </div>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           {[
-            { value: 'all', label: 'All' },
-            { value: 'مهتم بالايجار', label: 'Interested' },
-            { value: 'غير مهتم', label: 'Not Interested' },
-            { value: 'نفذ خارج الشركه', label: 'Left Company' },
+            { value: 'all', label: t('all') },
+            { value: 'مهتم بالايجار', label: t('interestedInRent') },
+            { value: 'غير مهتم', label: t('notInterested') },
+            { value: 'نفذ خارج الشركه', label: t('leftCompany') },
           ].map(f => (
             <button key={f.value} className={`btn-sm ${filter === f.value ? 'btn-primary' : 'btn-default'}`}
               onClick={() => { setFilter(f.value); resetPage(); }} style={filter === f.value ? {} : { color: '#32363a' }}>
@@ -318,8 +320,8 @@ export default function Leads() {
           <div className="sap-tile">
             <div className="empty-state">
               <div className="empty-icon"><span className="material-icons" style={{ fontSize: '48px', color: '#d9d9d9' }}>description</span></div>
-              <h3>No leads found</h3>
-              <p>{search ? 'Try a different search' : 'Import leads or create one.'}</p>
+              <h3>{t('noLeadsFound')}</h3>
+              <p>{search ? t('searchLeads') : t('importLeadsHint')}</p>
             </div>
           </div>
         ) : (
@@ -327,16 +329,16 @@ export default function Leads() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Lead #</th>
-                  <th>Name</th>
-                  <th>Mobile</th>
-                  <th>Call Status</th>
-                  <th>Client Status</th>
-                  <th>Unit Type</th>
-                  <th>Activity</th>
-                  <th>Assigned To</th>
-                  <th>Follow-up</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th>{t('leadNumber')}</th>
+                  <th>{t('name')}</th>
+                  <th>{t('mobile')}</th>
+                  <th>{t('callStatus')}</th>
+                  <th>{t('clientStatus')}</th>
+                  <th>{t('unitTypeInterest')}</th>
+                  <th>{t('activityType')}</th>
+                  <th>{t('assignedTo')}</th>
+                  <th>{t('followup')}</th>
+                  <th style={{ textAlign: 'right' }}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -365,10 +367,10 @@ export default function Leads() {
                       <td>{l.assigned_to_name || '—'}</td>
                       <td className="cell-muted">{l.last_followup ? formatDate(l.last_followup) : '—'}</td>
                       <td className="actions" onClick={(e) => e.stopPropagation()}>
-                        <button className="btn-icon btn-icon-primary" onClick={() => openEdit(l)} title="Edit">
+                        <button className="btn-icon btn-icon-primary" onClick={() => openEdit(l)} title={t('edit')}>
                           <span className="material-icons">edit</span>
                         </button>
-                        <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(l.id)} title="Delete">
+                        <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(l.id)} title={t('delete')}>
                           <span className="material-icons">delete</span>
                         </button>
                       </td>
@@ -395,7 +397,7 @@ export default function Leads() {
             <div className="modal-header">
               <h2>
                 <span className="material-icons" style={{ fontSize: '22px', color: '#0a6ed1' }}>description</span>
-                {editing ? 'Edit Lead' : 'New Lead'}
+                {editing ? t('editLead') : t('newLead')}
               </h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>
                 <span className="material-icons" style={{ fontSize: '20px' }}>close</span>
@@ -403,10 +405,10 @@ export default function Leads() {
             </div>
             <form onSubmit={handleSave}>
               <div className="modal-body">
-                <div className="section-title">Client Information</div>
+                <div className="section-title">{t('clientInformation')}</div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Salutation</label>
+                    <label>{t('salutation')}</label>
                     <select value={form.salutation} onChange={(e) => setForm({...form, salutation: e.target.value})}>
                       <option value="">—</option>
                       <option value="Mr">Mr</option>
@@ -415,79 +417,79 @@ export default function Leads() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Last Name <span className="required">*</span></label>
-                    <input value={form.last_name} onChange={(e) => setForm({...form, last_name: e.target.value})} placeholder="Client name" required />
+                    <label>{t('lastName')} <span className="required">*</span></label>
+                    <input value={form.last_name} onChange={(e) => setForm({...form, last_name: e.target.value})} placeholder={t('clientName')} required />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Mobile</label>
+                  <label>{t('mobileNumber')}</label>
                   <input type="tel" value={form.mobile} onChange={(e) => setForm({...form, mobile: e.target.value})} placeholder="Phone number" />
                 </div>
 
-                <div className="section-title" style={{ marginTop: '0.5rem' }}>Status & Classification</div>
+                <div className="section-title" style={{ marginTop: '0.5rem' }}>{t('statusClassification')}</div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Call Status</label>
+                    <label>{t('callStatus')}</label>
                     <select value={form.call_status_id} onChange={(e) => setForm({...form, call_status_id: e.target.value})}>
-                      <option value="">— Select —</option>
+                      <option value="">— {t('select')} —</option>
                       {callStatuses.map(s => <option key={s.id} value={String(s.id)}>{s.name}</option>)}
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Client Status</label>
+                    <label>{t('clientStatus')}</label>
                     <select value={form.client_status_id} onChange={(e) => setForm({...form, client_status_id: e.target.value})}>
-                      <option value="">— Select —</option>
+                      <option value="">— {t('select')} —</option>
                       {clientStatuses.map(s => <option key={s.id} value={String(s.id)}>{s.name}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Unit Type Interest</label>
+                    <label>{t('unitTypeInterest')}</label>
                     <select value={form.unit_type_id} onChange={(e) => setForm({...form, unit_type_id: e.target.value})}>
-                      <option value="">— Select —</option>
+                      <option value="">— {t('select')} —</option>
                       {unitTypes.map(s => <option key={s.id} value={String(s.id)}>{s.name}</option>)}
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Activity Type</label>
+                    <label>{t('activityType')}</label>
                     <select value={form.activity_type_id} onChange={(e) => setForm({...form, activity_type_id: e.target.value})}>
-                      <option value="">— Select —</option>
+                      <option value="">— {t('select')} —</option>
                       {activityTypes.map(s => <option key={s.id} value={String(s.id)}>{s.name}</option>)}
                     </select>
                   </div>
                 </div>
 
-                <div className="section-title" style={{ marginTop: '0.5rem' }}>Assignment & Follow-up</div>
+                <div className="section-title" style={{ marginTop: '0.5rem' }}>{t('assignmentFollowup')}</div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Assigned To</label>
+                    <label>{t('assignedTo')}</label>
                     <select value={form.assigned_to_id} onChange={(e) => setForm({...form, assigned_to_id: e.target.value})}>
-                      <option value="">— Unassigned —</option>
+                      <option value="">— {t('unassigned')} —</option>
                       {employees.map(e => <option key={e.id} value={String(e.id)}>{e.name}</option>)}
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Last Follow-up</label>
+                    <label>{t('followup')}</label>
                     <input type="date" value={form.last_followup} onChange={(e) => setForm({...form, last_followup: e.target.value})} />
                   </div>
                 </div>
 
-                <div className="section-title" style={{ marginTop: '0.5rem' }}>Notes</div>
+                <div className="section-title" style={{ marginTop: '0.5rem' }}>{t('notes')}</div>
                 <div className="form-group">
-                  <label>Feedback</label>
+                  <label>{t('feedback')}</label>
                   <textarea value={form.feedback} onChange={(e) => setForm({...form, feedback: e.target.value})} rows={2} placeholder="Call feedback..." />
                 </div>
                 <div className="form-group">
-                  <label>Description</label>
+                  <label>{t('description')}</label>
                   <textarea value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} rows={3} placeholder="Additional notes..." />
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>{t('cancel')}</button>
                 <button type="submit" className="btn-primary">
                   <span className="material-icons" style={{ fontSize: '18px' }}>save</span>
-                  {editing ? 'Update' : 'Create'}
+                  {editing ? t('update') : t('create')}
                 </button>
               </div>
             </form>

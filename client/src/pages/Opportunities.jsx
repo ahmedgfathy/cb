@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import { useI18n } from '../i18n'
 import Pagination from '../components/Pagination'
 
 const emptyOpp = {
@@ -8,6 +9,7 @@ const emptyOpp = {
 }
 
 export default function Opportunities() {
+  const { t } = useI18n()
   const [opps, setOpps] = useState([])
   const [contacts, setContacts] = useState([])
   const [properties, setProperties] = useState([])
@@ -63,7 +65,7 @@ export default function Opportunities() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Delete this opportunity?')) return
+    if (!confirm(t('deleteOpportunity'))) return
     try { await api.deleteOpportunity(id); setOpps(opps.filter(o => o.id !== id)) }
     catch (err) { alert(err.message) }
   }
@@ -73,7 +75,7 @@ export default function Opportunities() {
   return (
     <div>
       <div className="page-header">
-        <h1>💼 Opportunities</h1>
+        <h1><span className="material-icons">work</span> {t('opportunitiesTitle')}</h1>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
             value={filter}
@@ -83,48 +85,48 @@ export default function Opportunities() {
               fontSize: '0.8125rem', color: '#fff', background: 'rgba(255,255,255,0.15)',
             }}
           >
-            <option value="all" style={{ color: '#32363a', background: '#fff' }}>All Stages</option>
-            <option value="prospect" style={{ color: '#32363a', background: '#fff' }}>Prospect</option>
-            <option value="negotiation" style={{ color: '#32363a', background: '#fff' }}>Negotiation</option>
-            <option value="proposal" style={{ color: '#32363a', background: '#fff' }}>Proposal</option>
-            <option value="won" style={{ color: '#32363a', background: '#fff' }}>Won</option>
-            <option value="lost" style={{ color: '#32363a', background: '#fff' }}>Lost</option>
+            <option value="all" style={{ color: '#32363a', background: '#fff' }}>{t('allStages')}</option>
+            <option value="prospect" style={{ color: '#32363a', background: '#fff' }}>{t('prospect')}</option>
+            <option value="negotiation" style={{ color: '#32363a', background: '#fff' }}>{t('negotiation')}</option>
+            <option value="proposal" style={{ color: '#32363a', background: '#fff' }}>{t('proposal')}</option>
+            <option value="won" style={{ color: '#32363a', background: '#fff' }}>{t('won')}</option>
+            <option value="lost" style={{ color: '#32363a', background: '#fff' }}>{t('lost')}</option>
           </select>
-          <button className="btn-primary" onClick={openNew}>+ New Opportunity</button>
+          <button className="btn-primary" onClick={openNew}>+ {t('addOpportunity')}</button>
         </div>
       </div>
 
       <div className="page-body">
-        {loading ? <div className="loading-spinner">Loading...</div>
+        {loading ? <div className="loading-spinner">{t('loading')}</div>
          : filtered.length === 0 ? (
           <div className="sap-tile">
             <div className="empty-state">
-              <div className="empty-icon">💼</div>
-              <p>No opportunities found</p>
+              <div className="empty-icon"><span className="material-icons" style={{ fontSize: '48px' }}>work</span></div>
+              <p>{t('noOpportunities')}</p>
             </div>
           </div>
         ) : (
           <>
             <div className="sap-tile" style={{ marginBottom: '1rem', padding: '0.75rem 1rem', display: 'flex', gap: '2rem' }}>
               <span style={{ fontSize: '0.8125rem', color: '#6a6d70' }}>
-                <strong style={{ color: '#32363a' }}>{filtered.length}</strong> opportunities
+                <strong style={{ color: '#32363a' }}>{filtered.length}</strong> {t('opportunitiesCount')}
               </span>
               <span style={{ fontSize: '0.8125rem', color: '#6a6d70' }}>
-                Total Value: <strong className="price">${totalValue.toLocaleString()}</strong>
+                {t('totalValue')}: <strong className="price">${totalValue.toLocaleString()}</strong>
               </span>
             </div>
             <div className="sap-table-wrap">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Opportunity</th>
-                    <th>Property</th>
-                    <th>Contact</th>
-                    <th>Stage</th>
-                    <th style={{ textAlign: 'right' }}>Amount</th>
-                    <th>Prob.</th>
-                    <th>Expected Close</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
+                    <th>{t('opportunityName')}</th>
+                    <th>{t('property')}</th>
+                    <th>{t('contact')}</th>
+                    <th>{t('stage')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('amount')}</th>
+                    <th>{t('probability')}</th>
+                    <th>{t('expectedCloseDate')}</th>
+                    <th style={{ textAlign: 'right' }}>{t('actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -163,25 +165,25 @@ export default function Opportunities() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editing ? 'Edit Opportunity' : 'New Opportunity'}</h2>
+              <h2>{editing ? t('editOpportunity') : t('newOpportunity')}</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
             <form onSubmit={handleSave}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label>Name <span className="required">*</span></label>
-                  <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder="Opportunity name" required />
+                  <label>{t('name')} <span className="required">*</span></label>
+                  <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder={t('opportunityName')} required />
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Contact</label>
+                    <label>{t('contact')}</label>
                     <select value={form.contact_id} onChange={(e) => setForm({...form, contact_id: e.target.value})}>
                       <option value="">— None —</option>
                       {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Property</label>
+                    <label>{t('property')}</label>
                     <select value={form.property_id} onChange={(e) => setForm({...form, property_id: e.target.value})}>
                       <option value="">— None —</option>
                       {properties.map(p => (
@@ -192,38 +194,38 @@ export default function Opportunities() {
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Stage</label>
+                    <label>{t('stage')}</label>
                     <select value={form.stage} onChange={(e) => setForm({...form, stage: e.target.value})}>
-                      <option value="prospect">Prospect</option>
-                      <option value="negotiation">Negotiation</option>
-                      <option value="proposal">Proposal</option>
-                      <option value="won">Won</option>
-                      <option value="lost">Lost</option>
+                      <option value="prospect">{t('prospect')}</option>
+                      <option value="negotiation">{t('negotiation')}</option>
+                      <option value="proposal">{t('proposal')}</option>
+                      <option value="won">{t('won')}</option>
+                      <option value="lost">{t('lost')}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Amount ($)</label>
+                    <label>{t('amount')}</label>
                     <input type="number" value={form.amount} onChange={(e) => setForm({...form, amount: e.target.value})} placeholder="0" />
                   </div>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Probability (%)</label>
+                    <label>{t('probability')}</label>
                     <input type="number" min="0" max="100" value={form.probability} onChange={(e) => setForm({...form, probability: e.target.value})} placeholder="0" />
                   </div>
                   <div className="form-group">
-                    <label>Expected Close Date</label>
+                    <label>{t('expectedCloseDate')}</label>
                     <input type="date" value={form.expected_close} onChange={(e) => setForm({...form, expected_close: e.target.value})} />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Notes</label>
+                  <label>{t('notes')}</label>
                   <textarea value={form.notes} onChange={(e) => setForm({...form, notes: e.target.value})} rows={3} placeholder="Notes..." />
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">{editing ? 'Update' : 'Create'}</button>
+                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>{t('cancel')}</button>
+                <button type="submit" className="btn-primary">{editing ? t('update') : t('create')}</button>
               </div>
             </form>
           </div>

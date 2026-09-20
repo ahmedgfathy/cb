@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
 import Pagination from '../components/Pagination'
+import { useI18n } from '../i18n'
 
 export default function Employees({ user }) {
+  const { t } = useI18n()
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -33,7 +35,7 @@ export default function Employees({ user }) {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Remove this employee?')) return
+    if (!confirm(t('removeConfirm'))) return
     try { await api.deleteEmployee(id, user.companyId); load() }
     catch (err) { alert(err.message) }
   }
@@ -45,22 +47,22 @@ export default function Employees({ user }) {
   return (
     <div>
       <div className="page-header">
-        <h1><span className="material-icons">people</span> Employees</h1>
+        <h1><span className="material-icons">people</span> {t('employeesTitle')}</h1>
         <button className="btn-primary" onClick={() => { setForm({ name: '', mobile: '', password: '' }); setError(''); setShowModal(true) }}>
           <span className="material-icons" style={{ fontSize: '18px' }}>person_add</span>
-          Add Employee
+          {t('addEmployee')}
         </button>
       </div>
       <div className="page-body">
-        {loading ? <div className="loading-spinner">Loading...</div>
+        {loading ? <div className="loading-spinner">{t('loading')}</div>
          : employees.length === 0 ? (
           <div className="sap-tile">
             <div className="empty-state">
               <div className="empty-icon">
                 <span className="material-icons" style={{ fontSize: '48px', color: '#d9d9d9' }}>people</span>
               </div>
-              <h3>No employees yet</h3>
-              <p>Add your first team member to get started.</p>
+              <h3>{t('noEmployees')}</h3>
+              <p>{t('noEmployeesHint')}</p>
             </div>
           </div>
         ) : (
@@ -68,12 +70,12 @@ export default function Employees({ user }) {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Employee</th>
-                  <th>Mobile</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Joined</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th>{t('fullName')}</th>
+                  <th>{t('mobile')}</th>
+                  <th>{t('employeeRole')}</th>
+                  <th>{t('status')}</th>
+                  <th>{t('joined')}</th>
+                  <th style={{ textAlign: 'right' }}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -92,15 +94,15 @@ export default function Employees({ user }) {
                       </div>
                     </td>
                     <td>{emp.mobile}</td>
-                    <td><span className="badge badge-available">Employee</span></td>
+                    <td><span className="badge badge-available">{t('employee')}</span></td>
                     <td>
                       <span className={`badge ${emp.status === 'active' ? 'badge-available' : 'badge-pending'}`}>
-                        {emp.status}
+                        {emp.status === 'active' ? t('active') : t('pending')}
                       </span>
                     </td>
                     <td className="cell-muted">{new Date(emp.created_at).toLocaleDateString()}</td>
                     <td className="actions">
-                      <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(emp.id)} title="Remove employee">
+                      <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(emp.id)} title={t('removeEmployee')}>
                         <span className="material-icons">person_remove</span>
                       </button>
                     </td>
@@ -125,7 +127,7 @@ export default function Employees({ user }) {
             <div className="modal-header">
               <h2>
                 <span className="material-icons" style={{ fontSize: '22px', color: '#0a6ed1' }}>person_add</span>
-                Add Employee
+                {t('addEmployee')}
               </h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>
                 <span className="material-icons" style={{ fontSize: '20px' }}>close</span>
@@ -142,23 +144,23 @@ export default function Employees({ user }) {
             <form onSubmit={handleCreate}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label>Full Name <span className="required">*</span></label>
-                  <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder="Employee full name" required />
+                  <label>{t('fullName')} <span className="required">*</span></label>
+                  <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder={t('fullName')} required />
                 </div>
                 <div className="form-group">
-                  <label>Mobile Number <span className="required">*</span></label>
-                  <input type="tel" value={form.mobile} onChange={(e) => setForm({...form, mobile: e.target.value})} placeholder="Login mobile number" required />
+                  <label>{t('mobileNumber')} <span className="required">*</span></label>
+                  <input type="tel" value={form.mobile} onChange={(e) => setForm({...form, mobile: e.target.value})} placeholder={t('loginMobile')} required />
                 </div>
                 <div className="form-group">
-                  <label>Password <span className="required">*</span></label>
-                  <input type="password" value={form.password} onChange={(e) => setForm({...form, password: e.target.value})} placeholder="Set password (min 6 chars)" required minLength={6} />
+                  <label>{t('password')} <span className="required">*</span></label>
+                  <input type="password" value={form.password} onChange={(e) => setForm({...form, password: e.target.value})} placeholder={t('setPassword')} required minLength={6} />
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>{t('cancel')}</button>
                 <button type="submit" className="btn-primary">
                   <span className="material-icons" style={{ fontSize: '18px' }}>check</span>
-                  Create
+                  {t('create')}
                 </button>
               </div>
             </form>

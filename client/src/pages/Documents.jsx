@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import { useI18n } from '../i18n'
 import Pagination from '../components/Pagination'
 
 const emptyDoc = { name: '', type: 'contract', property_id: '', notes: '' }
 
 export default function Documents() {
+  const { t } = useI18n()
   const [docs, setDocs] = useState([])
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
@@ -39,20 +41,20 @@ export default function Documents() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Delete this document?')) return
+    if (!confirm(t('deleteContact'))) return
     try { await api.deleteDocument(id); setDocs(docs.filter(d => d.id !== id)) }
     catch (err) { alert(err.message) }
   }
 
-  const typeIcon = (t) => {
+  const typeIcon = (type) => {
     const icons = { contract: '📄', deed: '📜', invoice: '🧾', photo: '📷', other: '📁' }
-    return icons[t] || '📁'
+    return icons[type] || '📁'
   }
 
   return (
     <div>
       <div className="page-header">
-        <h1>📁 Documents</h1>
+        <h1><span className="material-icons">folder_open</span> {t('documentsTitle')}</h1>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
             value={filter}
@@ -63,24 +65,24 @@ export default function Documents() {
               fontSize: '0.8125rem', color: '#fff', background: 'rgba(255,255,255,0.15)',
             }}
           >
-            <option value="all" style={{ color: '#32363a', background: '#fff' }}>All Types</option>
-            <option value="contract" style={{ color: '#32363a', background: '#fff' }}>Contracts</option>
-            <option value="deed" style={{ color: '#32363a', background: '#fff' }}>Deeds</option>
-            <option value="invoice" style={{ color: '#32363a', background: '#fff' }}>Invoices</option>
-            <option value="photo" style={{ color: '#32363a', background: '#fff' }}>Photos</option>
-            <option value="other" style={{ color: '#32363a', background: '#fff' }}>Other</option>
+            <option value="all" style={{ color: '#32363a', background: '#fff' }}>{t('allTypes')}</option>
+            <option value="contract" style={{ color: '#32363a', background: '#fff' }}>{t('contract')}s</option>
+            <option value="deed" style={{ color: '#32363a', background: '#fff' }}>{t('deed')}s</option>
+            <option value="invoice" style={{ color: '#32363a', background: '#fff' }}>{t('invoice')}s</option>
+            <option value="photo" style={{ color: '#32363a', background: '#fff' }}>{t('photo')}s</option>
+            <option value="other" style={{ color: '#32363a', background: '#fff' }}>{t('other')}</option>
           </select>
-          <button className="btn-primary" onClick={() => { setForm(emptyDoc); setShowModal(true) }}>+ Add Document</button>
+          <button className="btn-primary" onClick={() => { setForm(emptyDoc); setShowModal(true) }}>+ {t('addDocument')}</button>
         </div>
       </div>
 
       <div className="page-body">
-        {loading ? <div className="loading-spinner">Loading...</div>
+        {loading ? <div className="loading-spinner">{t('loading')}</div>
          : filtered.length === 0 ? (
           <div className="sap-tile">
             <div className="empty-state">
-              <div className="empty-icon">📁</div>
-              <p>No documents yet</p>
+              <div className="empty-icon"><span className="material-icons" style={{ fontSize: '48px' }}>folder_open</span></div>
+              <p>{t('noDocuments')}</p>
             </div>
           </div>
         ) : (
@@ -88,12 +90,12 @@ export default function Documents() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Document</th>
-                  <th>Type</th>
-                  <th>Property</th>
-                  <th>Notes</th>
+                  <th>{t('documentName')}</th>
+                  <th>{t('documentType')}</th>
+                  <th>{t('property')}</th>
+                  <th>{t('notes')}</th>
                   <th>Created</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th style={{ textAlign: 'right' }}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,28 +133,28 @@ export default function Documents() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Add Document</h2>
+              <h2>{t('addDocument')}</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
             <form onSubmit={handleSave}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label>Name <span className="required">*</span></label>
-                  <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder="Document name" required />
+                  <label>{t('name')} <span className="required">*</span></label>
+                  <input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} placeholder={t('documentName')} required />
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Type</label>
+                    <label>{t('documentType')}</label>
                     <select value={form.type} onChange={(e) => setForm({...form, type: e.target.value})}>
-                      <option value="contract">Contract</option>
-                      <option value="deed">Deed</option>
-                      <option value="invoice">Invoice</option>
-                      <option value="photo">Photo</option>
-                      <option value="other">Other</option>
+                      <option value="contract">{t('contract')}</option>
+                      <option value="deed">{t('deed')}</option>
+                      <option value="invoice">{t('invoice')}</option>
+                      <option value="photo">{t('photo')}</option>
+                      <option value="other">{t('other')}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Property</label>
+                    <label>{t('property')}</label>
                     <select value={form.property_id} onChange={(e) => setForm({...form, property_id: e.target.value})}>
                       <option value="">— None —</option>
                       {properties.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
@@ -160,13 +162,13 @@ export default function Documents() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Notes</label>
-                  <textarea value={form.notes} onChange={(e) => setForm({...form, notes: e.target.value})} rows={3} placeholder="Document notes..." />
+                  <label>{t('notes')}</label>
+                  <textarea value={form.notes} onChange={(e) => setForm({...form, notes: e.target.value})} rows={3} placeholder={t('documentNotes')} />
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">Create</button>
+                <button type="button" className="btn-default" onClick={() => setShowModal(false)}>{t('cancel')}</button>
+                <button type="submit" className="btn-primary">{t('create')}</button>
               </div>
             </form>
           </div>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
 import Pagination from '../components/Pagination'
+import { useI18n } from '../i18n'
 
 export default function PendingApprovals() {
+  const { t } = useI18n()
   const [companies, setCompanies] = useState([])
   const [loading, setLoading] = useState(true)
   const [approving, setApproving] = useState(null)
@@ -30,7 +32,7 @@ export default function PendingApprovals() {
   }
 
   async function reject(id) {
-    if (!confirm('Reject this company registration?')) return
+    if (!confirm(t('rejectConfirm'))) return
     try { await api.rejectCompany(id); load() }
     catch (err) { alert(err.message) }
   }
@@ -42,24 +44,24 @@ export default function PendingApprovals() {
   return (
     <div>
       <div className="page-header">
-        <h1><span className="material-icons">pending_actions</span> Pending Approvals</h1>
+        <h1><span className="material-icons">pending_actions</span> {t('pendingApprovalsTitle')}</h1>
         {companies.length > 0 && (
           <span className="badge badge-pending" style={{ fontSize: '0.875rem' }}>
             <span className="material-icons" style={{ fontSize: '14px' }}>schedule</span>
-            {companies.length} pending
+            {companies.length} {t('pending')}
           </span>
         )}
       </div>
       <div className="page-body">
-        {loading ? <div className="loading-spinner">Loading...</div>
+        {loading ? <div className="loading-spinner">{t('loading')}</div>
          : companies.length === 0 ? (
           <div className="sap-tile">
             <div className="empty-state">
               <div className="empty-icon" style={{ background: '#edf7ed' }}>
                 <span className="material-icons" style={{ fontSize: '32px', color: '#36b37e' }}>check_circle</span>
               </div>
-              <h3>All caught up!</h3>
-              <p>No pending registrations to review.</p>
+              <h3>{t('allCaughtUp')}</h3>
+              <p>{t('noPendingRegistrations')}</p>
             </div>
           </div>
         ) : (
@@ -67,10 +69,10 @@ export default function PendingApprovals() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Company</th>
-                  <th>Contact Mobile</th>
-                  <th>Requested</th>
-                  <th style={{ textAlign: 'right' }}>Action</th>
+                  <th>{t('company')}</th>
+                  <th>{t('contactMobile')}</th>
+                  <th>{t('requested')}</th>
+                  <th style={{ textAlign: 'right' }}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -102,7 +104,7 @@ export default function PendingApprovals() {
                     <td style={{ textAlign: 'right' }}>
                       {approving === c.id ? (
                         <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', justifyContent: 'flex-end' }}>
-                          <span style={{ fontSize: '0.8125rem', color: '#6a6d70', whiteSpace: 'nowrap' }}>Max users:</span>
+                          <span style={{ fontSize: '0.8125rem', color: '#6a6d70', whiteSpace: 'nowrap' }}>{t('maxUsersLabel')}</span>
                           <input
                             type="number"
                             value={maxUsers}
@@ -116,17 +118,17 @@ export default function PendingApprovals() {
                           />
                           <button className="btn-primary btn-sm" style={{ background: '#36b37e' }} onClick={() => approve(c.id)}>
                             <span className="material-icons" style={{ fontSize: '16px' }}>check</span>
-                            Confirm
+                            {t('confirm')}
                           </button>
-                          <button className="btn-default btn-sm" onClick={() => setApproving(null)}>Cancel</button>
+                          <button className="btn-default btn-sm" onClick={() => setApproving(null)}>{t('cancel')}</button>
                         </div>
                       ) : (
                         <div style={{ display: 'flex', gap: '0.3rem', justifyContent: 'flex-end' }}>
                           <button className="btn-primary btn-sm" style={{ background: '#36b37e' }} onClick={() => setApproving(c.id)}>
                             <span className="material-icons" style={{ fontSize: '16px' }}>check</span>
-                            Approve
+                            {t('approve')}
                           </button>
-                          <button className="btn-icon btn-icon-danger" onClick={() => reject(c.id)} title="Reject">
+                          <button className="btn-icon btn-icon-danger" onClick={() => reject(c.id)} title={t('reject')}>
                             <span className="material-icons">close</span>
                           </button>
                         </div>

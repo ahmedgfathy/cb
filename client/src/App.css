@@ -37,6 +37,85 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Cairo font for Arabic */
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/Cairo-Variable.ttf') format('truetype');
+}
+
+/* Arabic RTL mode */
+body.rtl,
+body.rtl * {
+  direction: rtl;
+  text-align: right;
+}
+
+body.rtl {
+  font-family: 'Cairo', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body.rtl .material-icons {
+  direction: ltr;
+}
+
+body.rtl .pagination-buttons {
+  direction: ltr;
+}
+
+body.rtl .app-layout {
+  direction: rtl;
+}
+
+body.rtl .sidebar {
+  border-right: none;
+  border-left: 1px solid rgba(255,255,255,0.08);
+}
+
+body.rtl .main-content {
+  margin-left: 0;
+  margin-right: 15rem;
+}
+
+body.rtl .nav-item {
+  text-align: right;
+}
+
+body.rtl .form-row {
+  direction: rtl;
+}
+
+body.rtl table {
+  direction: rtl;
+}
+
+body.rtl th, body.rtl td {
+  text-align: right;
+}
+
+body.rtl th:first-child, body.rtl td:first-child {
+  text-align: right;
+}
+
+body.rtl th:last-child, body.rtl td:last-child {
+  text-align: left;
+}
+
+body.rtl .actions {
+  justify-content: flex-start;
+}
+
+body.rtl .badge {
+  direction: ltr;
+  display: inline-flex;
+}
+
+body.rtl .pagination-info {
+  direction: ltr;
+}
+
 /* Material Icons alignment */
 .material-icons {
   font-family: 'Material Icons';

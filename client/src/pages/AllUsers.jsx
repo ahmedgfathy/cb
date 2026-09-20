@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
 import Pagination from '../components/Pagination'
+import { useI18n } from '../i18n'
 
 export default function AllUsers() {
+  const { t } = useI18n()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -17,14 +19,14 @@ export default function AllUsers() {
   }
 
   const roleConfig = {
-    company_admin: { label: 'Company Admin', className: 'badge badge-buyer' },
-    employee: { label: 'Employee', className: 'badge badge-available' },
+    company_admin: { label: t('companyAdmin'), className: 'badge badge-buyer' },
+    employee: { label: t('employee'), className: 'badge badge-available' },
   }
 
   const statusConfig = {
-    active: { label: 'Active', className: 'badge badge-available' },
-    pending: { label: 'Pending', className: 'badge badge-pending' },
-    rejected: { label: 'Rejected', className: 'badge badge-lost' },
+    active: { label: t('active'), className: 'badge badge-available' },
+    pending: { label: t('pending'), className: 'badge badge-pending' },
+    rejected: { label: t('rejected'), className: 'badge badge-lost' },
   }
 
   const totalPages = Math.max(1, Math.ceil(users.length / perPage))
@@ -34,21 +36,21 @@ export default function AllUsers() {
   return (
     <div>
       <div className="page-header">
-        <h1><span className="material-icons">people</span> All Users</h1>
+        <h1><span className="material-icons">people</span> {t('allUsersTitle')}</h1>
         <span className="cell-muted" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem' }}>
-          {users.length} users
+          {users.length} {t('allUsers')}
         </span>
       </div>
       <div className="page-body">
-        {loading ? <div className="loading-spinner">Loading...</div>
+        {loading ? <div className="loading-spinner">{t('loading')}</div>
          : users.length === 0 ? (
           <div className="sap-tile">
             <div className="empty-state">
               <div className="empty-icon">
                 <span className="material-icons" style={{ fontSize: '48px', color: '#d9d9d9' }}>people</span>
               </div>
-              <h3>No users yet</h3>
-              <p>Users will appear once companies are approved and employees are added.</p>
+              <h3>{t('noUsers')}</h3>
+              <p>{t('noUsersHint')}</p>
             </div>
           </div>
         ) : (
@@ -56,12 +58,12 @@ export default function AllUsers() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>User</th>
-                  <th>Mobile</th>
-                  <th>Role</th>
-                  <th>Company</th>
-                  <th>Status</th>
-                  <th>Joined</th>
+                  <th>{t('user')}</th>
+                  <th>{t('mobile')}</th>
+                  <th>{t('employeeRole')}</th>
+                  <th>{t('company')}</th>
+                  <th>{t('status')}</th>
+                  <th>{t('joined')}</th>
                 </tr>
               </thead>
               <tbody>

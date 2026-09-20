@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import { useI18n } from '../i18n'
 
 const LOOKUP_CONFIG = [
-  { key: 'call_statuses', label: 'Call Statuses', icon: 'phone', desc: 'Values for call outcome (e.g., Answered, No Answer)' },
-  { key: 'client_statuses', label: 'Client Statuses', icon: 'person', desc: 'Values for client interest level' },
-  { key: 'unit_types', label: 'Unit Types', icon: 'apartment', desc: 'Values for property unit types' },
-  { key: 'activity_types', label: 'Activity Types', icon: 'work', desc: 'Values for business activity types' },
+  { key: 'call_statuses', labelKey: 'callStatuses', icon: 'phone', desc: 'Values for call outcome (e.g., Answered, No Answer)' },
+  { key: 'client_statuses', labelKey: 'clientStatuses', icon: 'person', desc: 'Values for client interest level' },
+  { key: 'unit_types', labelKey: 'unitTypes', icon: 'apartment', desc: 'Values for property unit types' },
+  { key: 'activity_types', labelKey: 'activityTypes', icon: 'work', desc: 'Values for business activity types' },
 ]
 
 export default function LookupValues() {
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState('call_statuses')
   const [items, setItems] = useState({})
   const [loading, setLoading] = useState(true)
@@ -63,7 +65,7 @@ export default function LookupValues() {
   return (
     <div>
       <div className="page-header">
-        <h1><span className="material-icons">list</span> Dropdown Values</h1>
+        <h1><span className="material-icons">list</span> {t('lookupValuesTitle')}</h1>
         <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem' }}>
           Manage leads dropdown options
         </span>
@@ -79,7 +81,7 @@ export default function LookupValues() {
               style={activeTab === cfg.key ? {} : { color: '#32363a' }}
             >
               <span className="material-icons" style={{ fontSize: '16px' }}>{cfg.icon}</span>
-              {cfg.label}
+              {t(cfg.labelKey)}
               {items[cfg.key] && (
                 <span style={{
                   marginLeft: '0.3rem',
@@ -100,7 +102,7 @@ export default function LookupValues() {
           <div style={{ padding: '0.5rem 0 1rem', borderBottom: '1px solid #f0f0f0', marginBottom: '0.75rem' }}>
             <div className="section-title" style={{ border: 'none', margin: 0, padding: 0 }}>
               <span className="material-icons" style={{ fontSize: '18px', color: '#0a6ed1' }}>{currentConfig?.icon}</span>
-              {currentConfig?.label}
+              {currentConfig ? t(currentConfig.labelKey) : ''}
             </div>
             <div style={{ fontSize: '0.8125rem', color: '#6a6d70' }}>{currentConfig?.desc}</div>
           </div>
@@ -109,7 +111,7 @@ export default function LookupValues() {
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder={`Add new ${currentConfig?.label?.toLowerCase().replace(/s$/, '')}...`}
+              placeholder={t('addNewValue')}
               style={{
                 flex: 1, height: '2.25rem', padding: '0 0.75rem',
                 border: '1px solid #d9d9d9', borderRadius: '0.375rem',
@@ -118,14 +120,14 @@ export default function LookupValues() {
             />
             <button type="submit" className="btn-primary btn-sm">
               <span className="material-icons" style={{ fontSize: '16px' }}>add</span>
-              Add
+              {t('addValue')}
             </button>
           </form>
 
-          {loading ? <div className="loading-spinner">Loading...</div>
+          {loading ? <div className="loading-spinner">{t('loading')}</div>
            : currentItems.length === 0 ? (
             <div className="empty-state" style={{ padding: '2rem 0' }}>
-              <h3>No values yet</h3>
+              <h3>{t('noValues')}</h3>
               <p>Add the first value above.</p>
             </div>
           ) : (
@@ -156,7 +158,7 @@ export default function LookupValues() {
                       <button className="btn-primary btn-sm" onClick={() => handleUpdate(item.id)} style={{ height: '1.875rem' }}>
                         <span className="material-icons" style={{ fontSize: '16px' }}>check</span>
                       </button>
-                      <button className="btn-default btn-sm" onClick={() => setEditingId(null)} style={{ height: '1.875rem' }}>Cancel</button>
+                      <button className="btn-default btn-sm" onClick={() => setEditingId(null)} style={{ height: '1.875rem' }}>{t('cancel')}</button>
                     </div>
                   ) : (
                     <>
