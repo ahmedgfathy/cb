@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 export default function PendingApprovals() {
   const [companies, setCompanies] = useState([])
   const [loading, setLoading] = useState(true)
   const [approving, setApproving] = useState(null)
   const [maxUsers, setMaxUsers] = useState(5)
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
 
   useEffect(() => { load() }, [])
 
@@ -31,6 +34,10 @@ export default function PendingApprovals() {
     try { await api.rejectCompany(id); load() }
     catch (err) { alert(err.message) }
   }
+
+  const totalPages = Math.max(1, Math.ceil(companies.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = companies.slice((safePage - 1) * perPage, safePage * perPage)
 
   return (
     <div>
@@ -67,7 +74,7 @@ export default function PendingApprovals() {
                 </tr>
               </thead>
               <tbody>
-                {companies.map((c) => (
+                {paged.map((c) => (
                   <tr key={c.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -129,6 +136,13 @@ export default function PendingApprovals() {
                 ))}
               </tbody>
             </table>
+            <Pagination 
+              total={companies.length} 
+              page={safePage} 
+              perPage={perPage}
+              onPageChange={setPage}
+              onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+            />
           </div>
         )}
       </div>

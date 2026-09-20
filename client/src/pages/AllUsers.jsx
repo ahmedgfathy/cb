@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 export default function AllUsers() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
 
   useEffect(() => { load() }, [])
 
@@ -23,6 +26,10 @@ export default function AllUsers() {
     pending: { label: 'Pending', className: 'badge badge-pending' },
     rejected: { label: 'Rejected', className: 'badge badge-lost' },
   }
+
+  const totalPages = Math.max(1, Math.ceil(users.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = users.slice((safePage - 1) * perPage, safePage * perPage)
 
   return (
     <div>
@@ -58,7 +65,7 @@ export default function AllUsers() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => {
+                {paged.map((u) => {
                   const rc = roleConfig[u.role] || { label: u.role, className: 'badge' }
                   const sc = statusConfig[u.status] || { label: u.status, className: 'badge' }
                   return (
@@ -86,6 +93,13 @@ export default function AllUsers() {
                 })}
               </tbody>
             </table>
+            <Pagination 
+              total={users.length} 
+              page={safePage} 
+              perPage={perPage}
+              onPageChange={setPage}
+              onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+            />
           </div>
         )}
       </div>

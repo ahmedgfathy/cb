@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 const emptyDoc = { name: '', type: 'contract', property_id: '', notes: '' }
 
@@ -10,6 +11,9 @@ export default function Documents() {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState(emptyDoc)
   const [filter, setFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
+  function resetPage() { setPage(1) }
 
   useEffect(() => {
     Promise.all([api.getDocuments(), api.getProperties()])
@@ -19,6 +23,10 @@ export default function Documents() {
   }, [])
 
   const filtered = filter === 'all' ? docs : docs.filter(d => d.type === filter)
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = filtered.slice((safePage - 1) * perPage, safePage * perPage)
 
   async function handleSave(e) {
     e.preventDefault()
@@ -48,7 +56,7 @@ export default function Documents() {
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) => { setFilter(e.target.value); resetPage(); }}
             style={{
               height: '2rem', padding: '0 0.65rem',
               border: '1px solid #89919a', borderRadius: '0.25rem',
@@ -89,7 +97,7 @@ export default function Documents() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((d) => (
+                {paged.map((d) => (
                   <tr key={d.id}>
                     <td>
                       <span style={{ marginRight: '0.4rem' }}>{typeIcon(d.type)}</span>
@@ -108,6 +116,13 @@ export default function Documents() {
                 ))}
               </tbody>
             </table>
+            <Pagination 
+              total={filtered.length} 
+              page={safePage} 
+              perPage={perPage}
+              onPageChange={setPage}
+              onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+            />
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 const emptyOpp = {
   name: '', contact_id: '', property_id: '', stage: 'prospect',
@@ -15,6 +16,9 @@ export default function Opportunities() {
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(emptyOpp)
   const [filter, setFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
+  function resetPage() { setPage(1) }
 
   useEffect(() => {
     Promise.all([api.getOpportunities(), api.getContacts(), api.getProperties()])
@@ -24,6 +28,10 @@ export default function Opportunities() {
   }, [])
 
   const filtered = filter === 'all' ? opps : opps.filter(o => o.stage === filter)
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = filtered.slice((safePage - 1) * perPage, safePage * perPage)
 
   function openNew() { setEditing(null); setForm(emptyOpp); setShowModal(true) }
   function openEdit(o) {
@@ -69,9 +77,8 @@ export default function Opportunities() {
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) => { setFilter(e.target.value); resetPage(); }}
             style={{
-              height: '2rem', padding: '0 0.65rem',
               border: '1px solid #89919a', borderRadius: '0.25rem',
               fontSize: '0.8125rem', color: '#fff', background: 'rgba(255,255,255,0.15)',
             }}
@@ -121,7 +128,7 @@ export default function Opportunities() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((o) => (
+                  {paged.map((o) => (
                     <tr key={o.id}>
                       <td><strong>{o.name}</strong></td>
                       <td>{o.property_title || '—'}</td>
@@ -140,6 +147,13 @@ export default function Opportunities() {
                   ))}
                 </tbody>
               </table>
+              <Pagination 
+                total={filtered.length} 
+                page={safePage} 
+                perPage={perPage}
+                onPageChange={setPage}
+                onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+              />
             </div>
           </>
         )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 const emptyProperty = {
   property_number: '', area: '', unit_for_id: '', property_type_id: '',
@@ -20,6 +21,9 @@ export default function Properties() {
   const [form, setForm] = useState(emptyProperty)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
+  function resetPage() { setPage(1) }
 
   const [propStatuses, setPropStatuses] = useState([])
   const [propTypes, setPropTypes] = useState([])
@@ -60,6 +64,10 @@ export default function Properties() {
     }
     return true
   })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = filtered.slice((safePage - 1) * perPage, safePage * perPage)
 
   function formatPrice(n) {
     if (!n) return '—'
@@ -249,7 +257,7 @@ export default function Properties() {
         <h1><span className="material-icons">home</span> Properties</h1>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <input type="text" placeholder="Search #, name, area..." value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); resetPage(); }}
             style={{ height: '2rem', padding: '0 0.75rem', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '0.375rem', fontSize: '0.875rem', color: '#fff', background: 'rgba(255,255,255,0.12)', width: '13rem', outline: 'none' }} />
           <button className="btn-primary" onClick={openNew}>
             <span className="material-icons" style={{ fontSize: '18px' }}>add</span>
@@ -293,7 +301,7 @@ export default function Properties() {
         <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           {['all', 'For sale', 'For Rent', 'Naw rented', 'Sold Out', 'Recycle', 'hold now'].map(f => (
             <button key={f} className={`btn-sm ${filter === f ? 'btn-primary' : 'btn-default'}`}
-              onClick={() => setFilter(f)} style={filter === f ? {} : { color: '#32363a' }}>
+              onClick={() => { setFilter(f); resetPage(); }} style={filter === f ? {} : { color: '#32363a' }}>
               {f === 'all' ? 'All' : f}
             </button>
           ))}
@@ -327,7 +335,7 @@ export default function Properties() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((p) => {
+                {paged.map((p) => {
                   const sc = statusColor(p.unit_for)
                   return (
                     <tr key={p.id} style={{ cursor: 'pointer' }} onClick={() => openDetail(p)}>
@@ -351,6 +359,13 @@ export default function Properties() {
                 })}
               </tbody>
             </table>
+            <Pagination 
+              total={filtered.length} 
+              page={safePage} 
+              perPage={perPage}
+              onPageChange={setPage}
+              onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+            />
           </div>
         )}
       </div>

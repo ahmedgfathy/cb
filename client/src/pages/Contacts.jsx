@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 const emptyContact = { name: '', email: '', phone: '', type: 'buyer', notes: '' }
 
@@ -10,6 +11,9 @@ export default function Contacts() {
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(emptyContact)
   const [filter, setFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
+  function resetPage() { setPage(1) }
 
   useEffect(() => { load() }, [])
 
@@ -20,6 +24,10 @@ export default function Contacts() {
   }
 
   const filtered = filter === 'all' ? contacts : contacts.filter(c => c.type === filter)
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = filtered.slice((safePage - 1) * perPage, safePage * perPage)
 
   function openNew() { setEditing(null); setForm(emptyContact); setShowModal(true) }
   function openEdit(c) {
@@ -51,9 +59,8 @@ export default function Contacts() {
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) => { setFilter(e.target.value); resetPage(); }}
             style={{
-              height: '2.25rem', padding: '0 0.75rem',
               border: '1px solid #d9d9d9', borderRadius: '0.25rem',
               fontSize: '0.8125rem', color: '#32363a', background: '#fff'
             }}
@@ -91,7 +98,7 @@ export default function Contacts() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((c) => (
+                {paged.map((c) => (
                   <tr key={c.id}>
                     <td><strong>{c.name}</strong></td>
                     <td>{c.email || '—'}</td>
@@ -108,6 +115,13 @@ export default function Contacts() {
                 ))}
               </tbody>
             </table>
+            <Pagination 
+              total={filtered.length} 
+              page={safePage} 
+              perPage={perPage}
+              onPageChange={setPage}
+              onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+            />
           </div>
         )}
       </div>

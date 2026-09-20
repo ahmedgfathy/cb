@@ -802,3 +802,144 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   Pagination
+   ═══════════════════════════════════════════════════ */
+
+.pagination-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.5rem;
+  border-top: 1px solid var(--sapListBorderColor);
+  background: #fafafa;
+  border-radius: 0 0 0.5rem 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pagination-info {
+  font-size: 0.8125rem;
+  color: var(--sapTextColorLight);
+  white-space: nowrap;
+}
+
+.pagination-info strong {
+  color: var(--sapTextColor);
+  font-weight: 600;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pagination-perpage {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--sapTextColorLight);
+}
+
+.pagination-select {
+  height: 1.75rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--sapInputBorder);
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  background: var(--sapInputBg);
+  color: var(--sapTextColor);
+  cursor: pointer;
+  outline: none;
+}
+
+.pagination-select:focus {
+  border-color: var(--sapInputBorderFocus);
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--sapInputBorder);
+  border-radius: 0.25rem;
+  background: var(--sapInputBg);
+  color: var(--sapTextColor);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.pagination-btn:hover:not(:disabled):not(.active) {
+  background: var(--sapHoverBg);
+  border-color: var(--sapBrandColor);
+  color: var(--sapBrandColor);
+}
+
+.pagination-btn.active {
+  background: var(--sapBrandColor);
+  border-color: var(--sapBrandColor);
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.75rem;
+  color: var(--sapTextColorMuted);
+  font-size: 0.875rem;
+}
+
+.pagination-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--sapTextColorLight);
+}
+
+.pagination-jump-input {
+  width: 3rem;
+  height: 1.75rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--sapInputBorder);
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  text-align: center;
+  outline: none;
+}
+
+.pagination-jump-input:focus {
+  border-color: var(--sapInputBorderFocus);
+}
+
+.pagination-jump-btn {
+  min-width: 1.5rem;
+  height: 1.75rem;
+  padding: 0;
+}

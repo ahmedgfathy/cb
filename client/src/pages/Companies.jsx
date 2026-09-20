@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 export default function Companies() {
   const [companies, setCompanies] = useState([])
@@ -7,6 +8,9 @@ export default function Companies() {
   const [editing, setEditing] = useState(null)
   const [maxUsers, setMaxUsers] = useState(5)
   const [filter, setFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
+  function resetPage() { setPage(1) }
 
   useEffect(() => { load() }, [filter])
 
@@ -32,12 +36,16 @@ export default function Companies() {
     rejected: { label: 'Rejected', className: 'badge badge-lost', icon: 'cancel' },
   }
 
+  const totalPages = Math.max(1, Math.ceil(companies.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = companies.slice((safePage - 1) * perPage, safePage * perPage)
+
   return (
     <div>
       <div className="page-header">
         <h1><span className="material-icons">apartment</span> Companies</h1>
         <div className="toolbar">
-          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <select value={filter} onChange={(e) => { setFilter(e.target.value); resetPage(); }}>
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="pending">Pending</option>
@@ -70,7 +78,7 @@ export default function Companies() {
                 </tr>
               </thead>
               <tbody>
-                {companies.map((c) => {
+                {paged.map((c) => {
                   const sc = statusConfig[c.status] || statusConfig.pending
                   return (
                     <tr key={c.id}>
@@ -142,6 +150,13 @@ export default function Companies() {
                 })}
               </tbody>
             </table>
+            <Pagination 
+              total={companies.length} 
+              page={safePage} 
+              perPage={perPage}
+              onPageChange={setPage}
+              onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+            />
           </div>
         )}
       </div>

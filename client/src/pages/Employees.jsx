@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 export default function Employees({ user }) {
   const [employees, setEmployees] = useState([])
@@ -7,6 +8,8 @@ export default function Employees({ user }) {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ name: '', mobile: '', password: '' })
   const [error, setError] = useState('')
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
 
   useEffect(() => { load() }, [])
 
@@ -34,6 +37,10 @@ export default function Employees({ user }) {
     try { await api.deleteEmployee(id, user.companyId); load() }
     catch (err) { alert(err.message) }
   }
+
+  const totalPages = Math.max(1, Math.ceil(employees.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = employees.slice((safePage - 1) * perPage, safePage * perPage)
 
   return (
     <div>
@@ -70,7 +77,7 @@ export default function Employees({ user }) {
                 </tr>
               </thead>
               <tbody>
-                {employees.map((emp) => (
+                {paged.map((emp) => (
                   <tr key={emp.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -101,6 +108,13 @@ export default function Employees({ user }) {
                 ))}
               </tbody>
             </table>
+            <Pagination 
+              total={employees.length} 
+              page={safePage} 
+              perPage={perPage}
+              onPageChange={setPage}
+              onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+            />
           </div>
         )}
       </div>

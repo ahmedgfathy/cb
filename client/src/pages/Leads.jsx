@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import Pagination from '../components/Pagination'
 
 const emptyLead = {
   salutation: '', last_name: '', mobile: '',
@@ -17,6 +18,9 @@ export default function Leads() {
   const [form, setForm] = useState(emptyLead)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
+  function resetPage() { setPage(1) }
 
   const [callStatuses, setCallStatuses] = useState([])
   const [clientStatuses, setClientStatuses] = useState([])
@@ -59,6 +63,10 @@ export default function Leads() {
     }
     return true
   })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paged = filtered.slice((safePage - 1) * perPage, safePage * perPage)
 
   function formatDate(d) {
     if (!d) return '—'
@@ -239,7 +247,7 @@ export default function Leads() {
         <h1><span className="material-icons">description</span> Leads</h1>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <input type="text" placeholder="Search name, mobile, lead#..." value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); resetPage(); }}
             style={{ height: '2rem', padding: '0 0.75rem', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '0.375rem', fontSize: '0.875rem', color: '#fff', background: 'rgba(255,255,255,0.12)', width: '13rem', outline: 'none' }} />
           <button className="btn-primary" onClick={openNew}>
             <span className="material-icons" style={{ fontSize: '18px' }}>add</span>
@@ -296,7 +304,7 @@ export default function Leads() {
             { value: 'نفذ خارج الشركه', label: 'Left Company' },
           ].map(f => (
             <button key={f.value} className={`btn-sm ${filter === f.value ? 'btn-primary' : 'btn-default'}`}
-              onClick={() => setFilter(f.value)} style={filter === f.value ? {} : { color: '#32363a' }}>
+              onClick={() => { setFilter(f.value); resetPage(); }} style={filter === f.value ? {} : { color: '#32363a' }}>
               {f.label}
             </button>
           ))}
@@ -332,7 +340,7 @@ export default function Leads() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((l) => {
+                {paged.map((l) => {
                   const sc = statusColor(l.call_status)
                   const csc = statusColor(l.client_status)
                   return (
@@ -369,6 +377,13 @@ export default function Leads() {
                 })}
               </tbody>
             </table>
+            <Pagination 
+              total={filtered.length} 
+              page={safePage} 
+              perPage={perPage}
+              onPageChange={setPage}
+              onPerPageChange={(n) => { setPerPage(n); setPage(1); }}
+            />
           </div>
         )}
       </div>
