@@ -77,20 +77,49 @@ async function initDB() {
       );
     `);
 
+    // ─── Property Lookup Tables (Company-scoped) ───
+    for (const tbl of ['property_statuses', 'property_types', 'finish_types', 'property_categories']) {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS ${tbl} (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
+          UNIQUE(name, company_id)
+        );
+      `);
+    }
+
+    // ─── Properties Master Table (FK-based, like leads) ───
     await pool.query(`
       CREATE TABLE IF NOT EXISTS properties (
         id SERIAL PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        address TEXT NOT NULL,
-        city VARCHAR(100) NOT NULL,
-        state VARCHAR(100) DEFAULT '',
-        price NUMERIC(12,2) NOT NULL,
-        type VARCHAR(50) DEFAULT 'house',
-        bedrooms INTEGER DEFAULT 0,
-        bathrooms INTEGER DEFAULT 0,
-        sqft INTEGER DEFAULT 0,
-        status VARCHAR(50) DEFAULT 'available',
+        property_number VARCHAR(50) DEFAULT '',
+        area VARCHAR(255) DEFAULT '',
+        unit_for_id INTEGER REFERENCES property_statuses(id) ON DELETE SET NULL,
+        property_type_id INTEGER REFERENCES property_types(id) ON DELETE SET NULL,
+        finish_type_id INTEGER REFERENCES finish_types(id) ON DELETE SET NULL,
+        building VARCHAR(100) DEFAULT '',
+        total_price NUMERIC(15,2) DEFAULT 0,
+        space VARCHAR(100) DEFAULT '',
+        unit_no VARCHAR(100) DEFAULT '',
         description TEXT DEFAULT '',
+        property_offered_by VARCHAR(255) DEFAULT '',
+        name VARCHAR(255) DEFAULT '',
+        mobile VARCHAR(255) DEFAULT '',
+        last_followup DATE,
+        note_of_call TEXT DEFAULT '',
+        new_feedback TEXT DEFAULT '',
+        date_of_last_call DATE,
+        rent_to VARCHAR(255) DEFAULT '',
+        property_name_compound VARCHAR(255) DEFAULT '',
+        handler_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        area_label VARCHAR(255) DEFAULT '',
+        land_area VARCHAR(100) DEFAULT '',
+        the_floors VARCHAR(255) DEFAULT '',
+        category_id INTEGER REFERENCES property_categories(id) ON DELETE SET NULL,
+        inside_outside VARCHAR(100) DEFAULT '',
+        sales VARCHAR(255) DEFAULT '',
+        last_modified_by VARCHAR(255) DEFAULT '',
         company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
         created_by INTEGER REFERENCES users(id),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -483,13 +512,20 @@ app.delete("/api/company/employees/:id", auth, companyAdminOrSuper, async (req, 
 
 app.get("/api/properties", auth, async (req, res) => {
   try {
-    if (req.user.role === "super_admin") {
-      const result = await pool.query("SELECT * FROM properties ORDER BY created_at DESC");
-      return res.json(result.rows);
-    }
+    const scope = req.user.role === "super_admin" ? "" : "WHERE p.company_id = $1";
+    const params = req.user.role === "super_admin" ? [] : [req.user.companyId];
     const result = await pool.query(
-      "SELECT * FROM properties WHERE company_id = $1 ORDER BY created_at DESC",
-      [req.user.companyId]
+      `SELECT p.*,
+        ps.name as unit_for, pt.name as property_type, ft.name as finish_type,
+        pc.name as category, u.name as handler_name
+       FROM properties p
+       LEFT JOIN property_statuses ps ON p.unit_for_id = ps.id
+       LEFT JOIN property_types pt ON p.property_type_id = pt.id
+       LEFT JOIN finish_types ft ON p.finish_type_id = ft.id
+       LEFT JOIN property_categories pc ON p.category_id = pc.id
+       LEFT JOIN users u ON p.handler_id = u.id
+       ${scope} ORDER BY p.created_at DESC`,
+      params
     );
     res.json(result.rows);
   } catch (err) {
@@ -499,15 +535,24 @@ app.get("/api/properties", auth, async (req, res) => {
 
 app.post("/api/properties", auth, async (req, res) => {
   try {
-    const { title, address, city, state, price, type, bedrooms, bathrooms, sqft, status, description } = req.body;
-    if (!title || !address || !city || !price) {
-      return res.status(400).json({ error: "Title, address, city and price are required" });
-    }
+    const { property_number, area, unit_for_id, property_type_id, finish_type_id,
+      building, total_price, space, unit_no, description, property_offered_by,
+      name, mobile, last_followup, note_of_call, new_feedback, rent_to,
+      property_name_compound, handler_id, area_label, land_area, the_floors,
+      category_id, inside_outside, sales } = req.body;
     const companyId = req.user.role === "super_admin" ? (req.body.company_id || null) : req.user.companyId;
     const result = await pool.query(
-      `INSERT INTO properties (title, address, city, state, price, type, bedrooms, bathrooms, sqft, status, description, company_id, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
-      [title, address, city, state || "", price, type || "house", bedrooms || 0, bathrooms || 0, sqft || 0, status || "available", description || "", companyId, req.user.id]
+      `INSERT INTO properties (property_number, area, unit_for_id, property_type_id, finish_type_id,
+        building, total_price, space, unit_no, description, property_offered_by,
+        name, mobile, last_followup, note_of_call, new_feedback, rent_to,
+        property_name_compound, handler_id, area_label, land_area, the_floors,
+        category_id, inside_outside, sales, company_id, created_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27) RETURNING *`,
+      [property_number || "", area || "", unit_for_id || null, property_type_id || null, finish_type_id || null,
+        building || "", total_price || 0, space || "", unit_no || "", description || "", property_offered_by || "",
+        name || "", mobile || "", last_followup || null, note_of_call || "", new_feedback || "", rent_to || "",
+        property_name_compound || "", handler_id || null, area_label || "", land_area || "", the_floors || "",
+        category_id || null, inside_outside || "", sales || "", companyId, req.user.id]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -517,16 +562,33 @@ app.post("/api/properties", auth, async (req, res) => {
 
 app.put("/api/properties/:id", auth, async (req, res) => {
   try {
-    const { title, address, city, state, price, type, bedrooms, bathrooms, sqft, status, description } = req.body;
+    const { property_number, area, unit_for_id, property_type_id, finish_type_id,
+      building, total_price, space, unit_no, description, property_offered_by,
+      name, mobile, last_followup, note_of_call, new_feedback, rent_to,
+      property_name_compound, handler_id, area_label, land_area, the_floors,
+      category_id, inside_outside, sales } = req.body;
     let query = `UPDATE properties SET
-      title = COALESCE($1,title), address = COALESCE($2,address), city = COALESCE($3,city),
-      state = COALESCE($4,state), price = COALESCE($5,price), type = COALESCE($6,type),
-      bedrooms = COALESCE($7,bedrooms), bathrooms = COALESCE($8,bathrooms), sqft = COALESCE($9,sqft),
-      status = COALESCE($10,status), description = COALESCE($11,description), updated_at = CURRENT_TIMESTAMP
-     WHERE id = $12`;
-    const params = [title, address, city, state, price, type, bedrooms, bathrooms, sqft, status, description, req.params.id];
+      property_number = COALESCE($1,property_number), area = COALESCE($2,area),
+      unit_for_id = COALESCE($3,unit_for_id), property_type_id = COALESCE($4,property_type_id),
+      finish_type_id = COALESCE($5,finish_type_id), building = COALESCE($6,building),
+      total_price = COALESCE($7,total_price), space = COALESCE($8,space),
+      unit_no = COALESCE($9,unit_no), description = COALESCE($10,description),
+      property_offered_by = COALESCE($11,property_offered_by), name = COALESCE($12,name),
+      mobile = COALESCE($13,mobile), last_followup = COALESCE($14,last_followup),
+      note_of_call = COALESCE($15,note_of_call), new_feedback = COALESCE($16,new_feedback),
+      rent_to = COALESCE($17,rent_to), property_name_compound = COALESCE($18,property_name_compound),
+      handler_id = COALESCE($19,handler_id), area_label = COALESCE($20,area_label),
+      land_area = COALESCE($21,land_area), the_floors = COALESCE($22,the_floors),
+      category_id = COALESCE($23,category_id), inside_outside = COALESCE($24,inside_outside),
+      sales = COALESCE($25,sales), updated_at = CURRENT_TIMESTAMP
+     WHERE id = $26`;
+    const params = [property_number, area, unit_for_id, property_type_id, finish_type_id,
+      building, total_price, space, unit_no, description, property_offered_by,
+      name, mobile, last_followup, note_of_call, new_feedback, rent_to,
+      property_name_compound, handler_id, area_label, land_area, the_floors,
+      category_id, inside_outside, sales, req.params.id];
     if (req.user.role !== "super_admin") {
-      query += " AND company_id = $13";
+      query += " AND company_id = $27";
       params.push(req.user.companyId);
     }
     query += " RETURNING *";
@@ -849,7 +911,7 @@ app.get("/api/admin/users", auth, superAdminOnly, async (req, res) => {
 //  LOOKUP TABLES (Company Admin manages)
 // ═══════════════════════════════════════════════════
 
-const lookupTables = ["call_statuses", "client_statuses", "unit_types", "activity_types"];
+const lookupTables = ["call_statuses", "client_statuses", "unit_types", "activity_types", "property_statuses", "property_types", "finish_types", "property_categories"];
 
 for (const tableName of lookupTables) {
   // GET all for company
@@ -1144,6 +1206,122 @@ app.post("/api/import/leads", auth, companyAdminOrSuper, async (req, res) => {
     }
 
     res.json({ message: `Imported ${imported} leads, skipped ${skipped}` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/import/properties", auth, companyAdminOrSuper, async (req, res) => {
+  try {
+    const companyId = req.user.role === "super_admin" ? (req.body.company_id || null) : req.user.companyId;
+    if (!companyId) return res.status(400).json({ error: "Company not found" });
+
+    const { rows } = req.body;
+    if (!rows || !Array.isArray(rows) || rows.length === 0) {
+      return res.status(400).json({ error: "No data rows provided" });
+    }
+
+    async function getOrCreate(table, name, companyId) {
+      if (!name || !name.trim()) return null;
+      const trimmed = name.trim().substring(0, 100);
+      let result = await pool.query(`SELECT id FROM ${table} WHERE name = $1 AND company_id = $2`, [trimmed, companyId]);
+      if (result.rows.length > 0) return result.rows[0].id;
+      result = await pool.query(`INSERT INTO ${table} (name, company_id) VALUES ($1, $2) RETURNING id`, [trimmed, companyId]);
+      return result.rows[0].id;
+    }
+
+    async function getOrCreateAgent(name, companyId) {
+      if (!name || !name.trim()) return null;
+      const trimmed = name.trim();
+      let result = await pool.query(`SELECT id FROM users WHERE name = $1 AND company_id = $2`, [trimmed, companyId]);
+      if (result.rows.length > 0) return result.rows[0].id;
+      const hash = await bcrypt.hash("agent123", 10);
+      result = await pool.query(
+        `INSERT INTO users (name, mobile, password, role, company_id, status) VALUES ($1, $2, $3, 'employee', $4, 'active') ON CONFLICT (mobile) DO NOTHING RETURNING id`,
+        [trimmed, `agent_${trimmed.toLowerCase()}_${companyId}`, hash, companyId]
+      );
+      if (result.rows.length > 0) return result.rows[0].id;
+      result = await pool.query(`SELECT id FROM users WHERE name = $1 AND company_id = $2`, [trimmed, companyId]);
+      return result.rows.length > 0 ? result.rows[0].id : null;
+    }
+
+    function parsePrice(p) {
+      if (!p) return 0;
+      return parseFloat(String(p).replace(/,/g, '')) || 0;
+    }
+
+    function parseDate(d) {
+      if (!d || !d.trim() || d.trim() === '--' || d.trim() === '-' || d.trim() === '0' || d.trim() === '0000-00-00') return null;
+      const parts = d.trim().split(/[-/]/);
+      if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+        const dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        // Validate the date parts are reasonable
+        const y = parseInt(parts[2]), m = parseInt(parts[1]), day = parseInt(parts[0]);
+        if (isNaN(y) || isNaN(m) || isNaN(day) || y < 1900 || y > 2100 || m < 1 || m > 12 || day < 1 || day > 31) return null;
+        return dateStr;
+      }
+      return null;
+    }
+
+    let imported = 0;
+    let skipped = 0;
+
+    for (const row of rows) {
+      try {
+        const propNum = row["Property Number"] || "";
+        if (!propNum) { skipped++; continue; }
+
+        const exists = await pool.query("SELECT id FROM properties WHERE property_number = $1 AND company_id = $2", [propNum, companyId]);
+        if (exists.rows.length > 0) { skipped++; continue; }
+
+        const unitForId = await getOrCreate("property_statuses", row["Unit For"], companyId);
+        const propTypeId = await getOrCreate("property_types", row["Type"], companyId);
+        const finishTypeId = await getOrCreate("finish_types", row["Finished"], companyId);
+        const categoryId = await getOrCreate("property_categories", row["STATUS"], companyId);
+        const handlerId = await getOrCreateAgent(row["Handler"], companyId);
+
+        await pool.query(
+          `INSERT INTO properties (property_number, area, unit_for_id, property_type_id, finish_type_id,
+            building, total_price, space, unit_no, description, property_offered_by,
+            name, mobile, last_followup, note_of_call, new_feedback,
+            property_name_compound, handler_id, area_label, land_area, the_floors,
+            category_id, inside_outside, sales, last_modified_by, company_id, created_by)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27)`,
+          [
+            propNum,
+            row["Area"] || "",
+            unitForId, propTypeId, finishTypeId,
+            row["Building"] || "",
+            parsePrice(row["Total Price"]),
+            row["SPACE \\ M"] || row["SPACE \\M"] || row["SPACE \ M"] || "",
+            row["Unit NO"] || "",
+            row["Description"] || "",
+            row["Property Offered By"] || "",
+            row["Name"] || "",
+            row["Mobile No."] || "",
+            parseDate(row["Last Follow in"]),
+            row["NOTE OF CALL"] || row["ابديت المكالمات"] || "",
+            row["NEW FEEDBACK"] || "",
+            row["Property Name - Compound Name"] || "",
+            handlerId,
+            row["AREA LABLE"] || "",
+            row["Land area"] || "",
+            row["The Floors"] || "",
+            categoryId,
+            row["داخل كمبوند / خارج كمبوند"] || "",
+            row["Sales"] || "",
+            row["Last Modified By"] || "",
+            companyId, req.user.id
+          ]
+        );
+        imported++;
+      } catch (e) {
+        console.error("Property import error:", e.message);
+        skipped++;
+      }
+    }
+
+    res.json({ message: `Imported ${imported} properties, skipped ${skipped}` });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
