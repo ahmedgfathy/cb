@@ -38,12 +38,9 @@ export default function Employees({ user }) {
   return (
     <div>
       <div className="page-header">
-        <h1>
-          <svg className="header-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 100-6 3 3 0 000 6z"/><path fillRule="evenodd" d="M5.214 14A2.238 2.238 0 015 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 005 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/><path d="M4.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"/></svg>
-          Employees
-        </h1>
+        <h1><span className="material-icons">people</span> Employees</h1>
         <button className="btn-primary" onClick={() => { setForm({ name: '', mobile: '', password: '' }); setError(''); setShowModal(true) }}>
-          <svg className="icon-sm" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"/></svg>
+          <span className="material-icons" style={{ fontSize: '18px' }}>person_add</span>
           Add Employee
         </button>
       </div>
@@ -53,7 +50,7 @@ export default function Employees({ user }) {
           <div className="sap-tile">
             <div className="empty-state">
               <div className="empty-icon">
-                <svg viewBox="0 0 16 16" fill="currentColor"><path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 100-6 3 3 0 000 6z"/><path fillRule="evenodd" d="M5.214 14A2.238 2.238 0 015 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 005 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/><path d="M4.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"/></svg>
+                <span className="material-icons" style={{ fontSize: '48px', color: '#d9d9d9' }}>people</span>
               </div>
               <h3>No employees yet</h3>
               <p>Add your first team member to get started.</p>
@@ -78,9 +75,9 @@ export default function Employees({ user }) {
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <div style={{
-                          width: '2rem', height: '2rem', borderRadius: '50%',
+                          width: '2.25rem', height: '2.25rem', borderRadius: '50%',
                           background: '#36b37e', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: '#fff', fontWeight: 700, fontSize: '0.75rem', flexShrink: 0,
+                          color: '#fff', fontWeight: 700, fontSize: '0.8125rem', flexShrink: 0,
                         }}>
                           {emp.name?.[0]?.toUpperCase() || '?'}
                         </div>
@@ -97,7 +94,7 @@ export default function Employees({ user }) {
                     <td className="cell-muted">{new Date(emp.created_at).toLocaleDateString()}</td>
                     <td className="actions">
                       <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(emp.id)} title="Remove employee">
-                        <svg className="icon-sm" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/><path fillRule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 010-2h3a1 1 0 011-1h3a1 1 0 011 1h3a1 1 0 011 1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"/></svg>
+                        <span className="material-icons">person_remove</span>
                       </button>
                     </td>
                   </tr>
@@ -113,17 +110,17 @@ export default function Employees({ user }) {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>
-                <svg className="icon-lg" viewBox="0 0 16 16" fill="#0a6ed1"><path d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"/></svg>
+                <span className="material-icons" style={{ fontSize: '22px', color: '#0a6ed1' }}>person_add</span>
                 Add Employee
               </h2>
               <button className="modal-close" onClick={() => setShowModal(false)}>
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 01.708 0L8 7.293l2.646-2.647a.5.5 0 01.708.708L8.707 8l2.647 2.646a.5.5 0 01-.708.708L8 8.707l-2.646 2.647a.5.5 0 01-.708-.708L7.293 8 4.646 5.354a.5.5 0 010-.708z"/></svg>
+                <span className="material-icons" style={{ fontSize: '20px' }}>close</span>
               </button>
             </div>
             {error && (
               <div style={{ margin: '0 1.5rem' }}>
                 <div className="sap-message sap-message-error">
-                  <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 15A7 7 0 118 1a7 7 0 010 14zm0 1A8 8 0 108 0a8 8 0 000 16z"/><path d="M7.002 11a1 1 0 112 0 1 1 0 01-2 0zM7.1 4.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 4.995z"/></svg>
+                  <span className="material-icons">error</span>
                   <span>{error}</span>
                 </div>
               </div>
@@ -146,7 +143,7 @@ export default function Employees({ user }) {
               <div className="modal-footer">
                 <button type="button" className="btn-default" onClick={() => setShowModal(false)}>Cancel</button>
                 <button type="submit" className="btn-primary">
-                  <svg className="icon-sm" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"/></svg>
+                  <span className="material-icons" style={{ fontSize: '18px' }}>check</span>
                   Create
                 </button>
               </div>

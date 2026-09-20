@@ -103,10 +103,9 @@ body {
   gap: 0.5rem;
 }
 
-.page-header h1 .header-icon {
-  width: 1.125rem;
-  height: 1.125rem;
-  opacity: 0.8;
+.page-header h1 .material-icons {
+  font-size: 20px;
+  opacity: 0.9;
 }
 
 /* ─── Page Content ─── */
@@ -222,13 +221,11 @@ body {
 }
 
 .icon-sm {
-  width: 0.875rem;
-  height: 0.875rem;
+  font-size: 16px;
 }
 
 .icon-lg {
-  width: 1.25rem;
-  height: 1.25rem;
+  font-size: 22px;
 }
 
 /* ─── Tiles ─── */
